@@ -9,3 +9,4 @@ No login. Also usable as a cheatsheet.
 - Product and engineering docs: [`docs/`](docs/README.md)
 - Stack and phases: [`PLAN.md`](PLAN.md)
 - Decisions: [`docs/adr/`](docs/adr/)
+- Work tracking: [Issues](https://github.com/aadarshjr123/brain/issues) · [Project board](https://github.com/users/aadarshjr123/projects/3)

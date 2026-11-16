@@ -43,7 +43,7 @@ Anything that constrains future work gets an ADR (`templates/adr.md`). Anything 
 ## Logging: local and remote mirror
 | Thing | Local | Remote |
 |---|---|---|
-| Plan | `docs/04-backlog.md` | GitHub Issues + Project board |
+| Plan | `docs/04-backlog.md` | [Issues](https://github.com/aadarshjr123/brain/issues) + [Project board](https://github.com/users/aadarshjr123/projects/3) |
 | Decisions | `docs/adr/` | Linked from the issue and PR; summary in Discussions |
 | Daily progress | `docs/journal/` | PR descriptions and issue comments |
 | Problems and learnings | `docs/journal/`, postmortems | Issue labelled `learning` or `incident` |
