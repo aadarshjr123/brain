@@ -1,0 +1,419 @@
+<title>Brain Map</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<style>
+/* Layout: three-pane lab bench. Actions (left) | browser map (center) | trace (right). Dark-first, like a devtools panel. */
+:root{
+  --bg:#0a0e14; --surface:#111822; --surface-2:#172131; --line:#24324a; --fg:#e8eef6; --muted:#8c9bb3;
+  --accent:#ffb454;
+  --c-net:#4fb3ff; --c-parse:#b48cff; --c-render:#ff7a59; --c-js:#ffd166; --c-store:#4ade80; --c-input:#f472b6;
+  --font-display:"Bricolage Grotesque","IBM Plex Sans",system-ui,sans-serif;
+  --font-body:"IBM Plex Sans",system-ui,sans-serif;
+  --font-mono:"IBM Plex Mono",ui-monospace,SFMono-Regular,Menlo,monospace;
+  color-scheme:dark;
+}
+@media (prefers-color-scheme: light){ :root:not([data-theme="dark"]){
+  --bg:#f3f5f9; --surface:#ffffff; --surface-2:#eaeef5; --line:#d4dbe7; --fg:#131a26; --muted:#5b6880;
+  --accent:#c2620a; --c-net:#0b7fd6; --c-parse:#7a4ddb; --c-render:#d9481f; --c-js:#b8860b; --c-store:#15803d; --c-input:#c2317f;
+  color-scheme:light; } }
+:root[data-theme="light"]{
+  --bg:#f3f5f9; --surface:#ffffff; --surface-2:#eaeef5; --line:#d4dbe7; --fg:#131a26; --muted:#5b6880;
+  --accent:#c2620a; --c-net:#0b7fd6; --c-parse:#7a4ddb; --c-render:#d9481f; --c-js:#b8860b; --c-store:#15803d; --c-input:#c2317f;
+  color-scheme:light; }
+
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--fg);font-family:var(--font-body);font-size:14px;line-height:1.5;
+  padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:12px 32px}
+button{font:inherit;color:inherit;background:none;border:0;cursor:pointer}
+:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+code{font-family:var(--font-mono);font-size:.92em}
+
+header{display:flex;flex-wrap:wrap;align-items:center;gap:12px 24px;padding-block:6px 14px;border-bottom:1px solid var(--line)}
+.brand{display:flex;align-items:baseline;gap:10px}
+.brand h1{font-family:var(--font-display);font-weight:700;font-size:22px;margin:0;letter-spacing:-.01em}
+.brand small{color:var(--muted);font-family:var(--font-mono);font-size:12px}
+.tabs{display:flex;gap:4px;background:var(--surface);border:1px solid var(--line);border-radius:999px;padding:3px}
+.tabs button{padding:5px 14px;border-radius:999px;color:var(--muted);font-weight:500}
+.tabs button[aria-selected="true"]{background:var(--surface-2);color:var(--fg)}
+.tag{margin-left:auto;font-family:var(--font-mono);font-size:11px;color:var(--muted);letter-spacing:.06em;text-transform:uppercase}
+
+.bench{display:grid;grid-template-columns:230px minmax(0,1fr) 300px;gap:14px;margin-top:14px;align-items:start}
+@media (max-width:980px){.bench{grid-template-columns:1fr}}
+.pane{background:var(--surface);border:1px solid var(--line);border-radius:10px;min-width:0}
+.pane-h{display:flex;align-items:center;gap:8px;padding:10px 12px;border-bottom:1px solid var(--line);font-family:var(--font-mono);font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
+
+/* actions */
+.actions{padding:6px}
+.group-label{font-family:var(--font-mono);font-size:10px;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);padding:10px 8px 4px}
+.action{display:flex;align-items:center;gap:8px;width:100%;text-align:left;padding:7px 8px;border-radius:7px;border:1px solid transparent}
+.action:hover{background:var(--surface-2)}
+.action[aria-pressed="true"]{background:var(--surface-2);border-color:var(--line)}
+.action .dot{width:7px;height:7px;border-radius:50%;flex:none;background:var(--c)}
+.action code{font-size:12px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+
+/* map */
+.map-wrap{position:relative}
+.map-wrap svg{display:block;width:100%;height:auto}
+.region{fill:var(--c);fill-opacity:.05;stroke:var(--c);stroke-opacity:.35;stroke-dasharray:4 4;rx:12}
+.region-label{font-family:var(--font-mono);font-size:10px;letter-spacing:.12em;text-transform:uppercase;fill:var(--c);opacity:.9}
+.node rect{fill:var(--surface-2);stroke:var(--line);stroke-width:1;rx:7;transition:stroke .2s,fill .2s}
+.node text{fill:var(--fg);font-size:11.5px;font-family:var(--font-body);pointer-events:none}
+.node.touched rect{stroke:var(--c)}
+.node.active rect{fill:var(--c);stroke:var(--c)}
+.node.active text{fill:#0a0e14;font-weight:600}
+.node.pulse rect{animation:pulse .6s ease-out}
+@keyframes pulse{0%{stroke-width:1}40%{stroke-width:6;stroke-opacity:.5}100%{stroke-width:1}}
+.edge{fill:none;stroke:var(--accent);stroke-width:2;stroke-linecap:round;opacity:.9}
+.edge.ghost{stroke:var(--line);stroke-width:1;opacity:.6}
+.spark{fill:var(--accent)}
+.legend{display:flex;flex-wrap:wrap;gap:6px 14px;padding:8px 12px;border-top:1px solid var(--line);font-size:12px;color:var(--muted)}
+.legend span::before{content:"";display:inline-block;width:8px;height:8px;border-radius:2px;background:var(--c);margin-right:6px;vertical-align:middle}
+.view-toggle{margin-left:auto;display:flex;gap:2px}
+.view-toggle button{padding:2px 8px;border-radius:5px;font-family:var(--font-mono);font-size:11px;letter-spacing:.06em;color:var(--muted)}
+.view-toggle button[aria-pressed="true"]{background:var(--surface-2);color:var(--fg)}
+#three-host{display:none;aspect-ratio:1000/640;max-width:100%;position:relative}
+#three-host canvas{display:block;width:100%;height:100%}
+#three-note{position:absolute;left:10px;bottom:10px;font-family:var(--font-mono);font-size:11px;color:var(--muted)}
+
+/* trace */
+.trace{padding:12px}
+.trace h2{font-family:var(--font-display);font-size:18px;margin:0 0 2px;text-wrap:balance}
+.trace .sub{color:var(--muted);margin:0 0 10px;font-size:13px}
+.chips{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:12px}
+.chip{font-family:var(--font-mono);font-size:11px;padding:2px 8px;border-radius:999px;border:1px solid var(--line);color:var(--muted)}
+.chip.warn{border-color:var(--c-render);color:var(--c-render)}
+.chip.good{border-color:var(--c-store);color:var(--c-store)}
+.steps{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:0;position:relative}
+.step{display:grid;grid-template-columns:22px 1fr;gap:8px;padding:6px 0;opacity:.28;transition:opacity .3s}
+.step.on{opacity:1}
+.step .n{width:20px;height:20px;border-radius:50%;background:var(--surface-2);border:1px solid var(--line);font-family:var(--font-mono);font-size:10px;display:grid;place-items:center;color:var(--muted)}
+.step.on .n{background:var(--c);color:#0a0e14;border-color:var(--c);font-weight:600}
+.step b{display:block;font-weight:600;font-size:13px}
+.step p{margin:0;color:var(--muted);font-size:12.5px}
+.pipe{margin-top:14px;border-top:1px solid var(--line);padding-top:10px}
+.pipe .lbl{font-family:var(--font-mono);font-size:10px;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);margin-bottom:6px}
+.stages{display:grid;grid-template-columns:repeat(5,1fr);gap:4px}
+.stage{text-align:center;font-family:var(--font-mono);font-size:10.5px;padding:7px 2px;border-radius:5px;border:1px solid var(--line);color:var(--muted);background:var(--surface)}
+.stage.hit{background:var(--c-render);border-color:var(--c-render);color:#0a0e14;font-weight:600}
+.stage.skip{text-decoration:line-through;opacity:.5}
+.gotcha{margin-top:12px;padding:10px;border-radius:7px;background:var(--surface-2);font-size:12.5px;border-left:3px solid var(--accent)}
+.gotcha b{font-family:var(--font-mono);font-size:10px;letter-spacing:.1em;text-transform:uppercase;color:var(--accent);display:block;margin-bottom:2px}
+
+/* recall */
+.recall{max-width:640px;margin:20px auto;padding:20px}
+.recall h2{font-family:var(--font-display);font-size:24px;margin:0 0 4px;text-wrap:balance}
+.recall .q{font-size:16px;margin:0 0 14px}
+.opts{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:14px}
+.opt{padding:8px 14px;border-radius:8px;border:1px solid var(--line);background:var(--surface-2);font-family:var(--font-mono);font-size:13px}
+.opt[aria-pressed="true"]{border-color:var(--accent);color:var(--accent)}
+.opt.right{border-color:var(--c-store);color:var(--c-store)}
+.opt.wrong{border-color:var(--c-render);color:var(--c-render)}
+.row{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+.btn{padding:8px 14px;border-radius:8px;background:var(--accent);color:#0a0e14;font-weight:600}
+.btn.ghost{background:var(--surface-2);color:var(--fg);border:1px solid var(--line)}
+.result{margin-top:12px;color:var(--muted)}
+.streak{font-family:var(--font-mono);font-size:12px;color:var(--muted);margin-left:auto}
+
+/* notes */
+.notes{max-width:760px;margin:20px auto;padding:20px;display:grid;gap:16px}
+.notes h2{font-family:var(--font-display);font-size:22px;margin:0}
+.notes h3{font-size:14px;margin:0 0 4px;font-family:var(--font-mono);letter-spacing:.06em;text-transform:uppercase;color:var(--accent)}
+.notes p,.notes li{color:var(--muted);max-width:65ch}
+.notes ul{margin:0;padding-left:18px}
+@media (prefers-reduced-motion: reduce){ .node.pulse rect{animation:none} .step{transition:none} }
+</style>
+
+<header>
+  <div class="brand"><h1>Brain</h1><small>frontend ↔ browser</small></div>
+  <div class="tabs" role="tablist">
+    <button role="tab" aria-selected="true" data-tab="map">Map</button>
+    <button role="tab" aria-selected="false" data-tab="recall">Recall</button>
+    <button role="tab" aria-selected="false" data-tab="notes">Build notes</button>
+  </div>
+  <span class="tag">mockup v0 · click an action</span>
+</header>
+
+<section id="tab-map" class="bench">
+  <div class="pane">
+    <div class="pane-h">What you do</div>
+    <div class="actions" id="actions"></div>
+  </div>
+
+  <div class="pane map-wrap">
+    <div class="pane-h">What the browser does
+      <div class="view-toggle"><button aria-pressed="true" data-view="2d">2D</button><button aria-pressed="false" data-view="3d">3D preview</button></div>
+    </div>
+    <svg id="map" viewBox="0 0 1000 640" role="img" aria-label="Browser subsystems map"></svg>
+    <div id="three-host"><div id="three-note">three.js · drag to orbit</div></div>
+    <div class="legend">
+      <span style="--c:var(--c-net)">Network</span><span style="--c:var(--c-parse)">Parsing</span><span style="--c:var(--c-render)">Render pipeline</span><span style="--c:var(--c-js)">JS runtime</span><span style="--c:var(--c-store)">Storage &amp; workers</span><span style="--c:var(--c-input)">Input</span>
+    </div>
+  </div>
+
+  <div class="pane trace" id="trace"></div>
+</section>
+
+<section id="tab-recall" class="pane recall" hidden></section>
+
+<section id="tab-notes" class="pane notes" hidden>
+  <h2>How the real build would work</h2>
+  <div><h3>Shape of the data</h3><p>Everything on this page is three JSON-ish lists: <code>nodes</code> (browser parts, grouped), <code>actions</code> (frontend things you do) and each action's ordered <code>trace</code>. The map, the trace panel, the pipeline strip and the recall quiz are all projections of the same data. Adding a concept means adding one action object, no new UI.</p></div>
+  <div><h3>Rendering</h3><p>2D here is plain SVG, which is enough up to a few hundred nodes. The 3D view is a straight port of the same positions to three.js: nodes become spheres, edges become line segments, the trace becomes a moving light. In the real build that lives in React Three Fiber with an on-demand frame loop so nothing renders while you read.</p></div>
+  <div><h3>Performance budget</h3><ul>
+    <li>Instanced meshes for nodes, one BufferGeometry for all edges, labels as SDF text (troika) not DOM.</li>
+    <li>Frame loop on demand. Animate the trace with a clock, resume rendering only during a trace or orbit.</li>
+    <li>Three.js chunk lazy-loaded. The 2D map is the default and ships first, so the page is useful before WebGL arrives.</li>
+    <li>Never touch React state per frame. Mutate refs inside useFrame.</li>
+    <li>Pause the loop when the tab is hidden or the canvas scrolls out of view.</li>
+  </ul></div>
+  <div><h3>Why a recall mode</h3><p>You said this is for coming back to relearn. Looking at a map is recognition, not recall. The quiz tab asks you to predict the trace before it is shown, which is what makes it stick.</p></div>
+</section>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/0.158.0/three.min.js"></script>
+<script>
+// ---------- DATA ----------
+const GROUPS = {
+  net:   {name:'Network',          color:'var(--c-net)',    box:[30,40,290,200]},
+  parse: {name:'Parsing',          color:'var(--c-parse)',  box:[340,40,330,130]},
+  input: {name:'Input / threads',  color:'var(--c-input)',  box:[690,40,280,130]},
+  render:{name:'Render pipeline',  color:'var(--c-render)', box:[340,200,630,110]},
+  js:    {name:'JS runtime',       color:'var(--c-js)',     box:[30,350,520,250]},
+  store: {name:'Storage & workers',color:'var(--c-store)',  box:[580,350,390,250]},
+};
+const NODES = [
+  ['dns','DNS',70,80,'net'],['tcp','TCP + TLS',70,125,'net'],['cache','HTTP cache',185,80,'net'],['cors','CORS / SOP check',185,125,'net'],['http','HTTP request',70,170,'net'],['net_resp','Response bytes',185,170,'net'],
+  ['html','HTML parser',370,80,'parse'],['preload','Preload scanner',500,80,'parse'],['cssp','CSS parser',370,125,'parse'],['jsparse','Script loader',500,125,'parse'],
+  ['browserp','Browser process',720,80,'input'],['comp_thread','Compositor thread',850,80,'input'],['hit','Hit test',720,125,'input'],['raster','Raster worker',850,125,'input'],
+  ['dom','DOM',360,235,'render'],['cssom','CSSOM',450,235,'render'],['style','Style',540,235,'render'],['layout','Layout',620,235,'render'],['paint','Paint',700,235,'render'],['composite','Composite',790,235,'render'],['gpu','GPU',890,235,'render'],
+  ['v8','V8 parse/compile',70,390,'js'],['stack','Call stack',220,390,'js'],['heap','Heap / GC',360,390,'js'],
+  ['micro','Microtask queue',70,445,'js'],['task','Task queue',220,445,'js'],['loop','Event loop',360,445,'js'],
+  ['raf','rAF callbacks',70,500,'js'],['webapi','Web APIs',220,500,'js'],['idle','Idle callbacks',360,500,'js'],
+  ['ls','localStorage',610,390,'store'],['idb','IndexedDB',740,390,'store'],['cookies','Cookies',870,390,'store'],
+  ['cacheapi','Cache API',610,445,'store'],['sw','Service worker',740,445,'store'],['worker','Web worker',870,445,'store'],
+].map(([id,label,x,y,g])=>({id,label,x,y,g}));
+const N = Object.fromEntries(NODES.map(n=>[n.id,n]));
+const STAGES = ['JS','Style','Layout','Paint','Composite'];
+
+const ACTIONS = [
+ {g:'HTML / loading', c:'parse', id:'navigate', code:'type a URL, hit enter', title:'First navigation', sub:'From keystroke to first pixel.',
+  chips:['critical path','main thread'], pipeline:[1,1,1,1,1],
+  trace:[['browserp','Browser process owns the address bar and spawns a renderer process for the tab.'],['dns','Hostname resolved to an IP. Cached by OS and browser.'],['tcp','TCP handshake then TLS. 1 to 3 round trips before any byte of HTML.'],['cache','Cache checked first. A fresh cached HTML skips the network entirely.'],['http','GET / with cookies and headers.'],['net_resp','Bytes stream in. Parsing starts before the response finishes.'],['html','Tokenizer turns bytes into tags, builds the DOM incrementally.'],['preload','A second lightweight parser runs ahead and kicks off fetches for scripts, CSS, images.'],['dom','Tree of elements. JS can touch it as soon as nodes exist.'],['cssp','Stylesheets parsed. Render-blocking: no pixels until CSSOM is ready.'],['cssom','Rules resolved into a cascade.'],['style','Each DOM node gets computed styles.'],['layout','Geometry: boxes, sizes, positions.'],['paint','Display list of draw commands per layer.'],['composite','Layers assembled on the compositor thread.'],['gpu','Tiles rasterised and drawn. First Contentful Paint.']],
+  gotcha:'A blocking stylesheet in <head> delays every pixel. Preload scanner saves you only if resources are discoverable in markup, not injected by JS.'},
+ {g:'HTML / loading', c:'parse', id:'script', code:'<script src="app.js">', title:'Classic script tag', sub:'Parser-blocking by default.',
+  chips:['blocks parser','main thread'], pipeline:[1,0,0,0,0],
+  trace:[['html','Parser reaches the script tag and stops. It cannot continue because the script may document.write.'],['jsparse','Script loader fetches the file (preload scanner may already have started it).'],['cache','Cache hit or network trip.'],['v8','Source parsed, bytecode compiled. Large bundles cost tens of ms here.'],['stack','Top-level code executes synchronously.'],['dom','Any DOM reads or writes happen against the partial tree.'],['html','Parser resumes only after the script finishes.']],
+  gotcha:'defer keeps order and runs after parsing; async runs as soon as it arrives in any order. Module scripts are deferred by default.'},
+ {g:'CSS', c:'render', id:'transform', code:'transform / opacity', title:'Compositor-only property', sub:'The cheap animation path.',
+  chips:['compositor thread','60fps safe'], pipeline:[0,1,0,0,1],
+  trace:[['style','Computed style updates, nothing else on the main thread needs to recalculate.'],['composite','The element already has its own layer, so the compositor just moves or fades it.'],['comp_thread','Runs off the main thread. Even if JS is busy, the animation stays smooth.'],['gpu','Layer re-drawn with a new matrix. No re-rasterisation.']],
+  gotcha:'Only works if the element is promoted to a layer (will-change or an existing transform). Too many layers eat GPU memory.'},
+ {g:'CSS', c:'render', id:'geometry', code:'width / top / margin', title:'Geometry property change', sub:'Full pipeline, main thread.',
+  chips:['layout','paint','main thread'], pipeline:[0,1,1,1,1],
+  trace:[['style','Style recalculated for the element and anything the selectors touch.'],['layout','Box sizes change, so siblings and ancestors may reflow. Cost scales with tree size.'],['paint','Affected areas repainted into display lists.'],['raster','Dirty tiles re-rasterised.'],['composite','Layers reassembled.'],['gpu','Frame drawn.']],
+  gotcha:'Animating these with CSS transitions runs on the main thread and competes with your JS for the 16ms budget.'},
+ {g:'CSS', c:'render', id:'color', code:'color / background', title:'Paint-only property', sub:'Skips layout, still repaints.',
+  chips:['paint','main thread'], pipeline:[0,1,0,1,1],
+  trace:[['style','Computed color changes.'],['paint','Geometry is unchanged so layout is skipped. Element repainted.'],['raster','Its tiles re-rasterised.'],['composite','Layers composited.'],['gpu','Frame drawn.']],
+  gotcha:'Cheap individually, expensive when the painted area is huge (full-page backgrounds, big shadows, blur filters).'},
+ {g:'JavaScript', c:'js', id:'setstate', code:'setState() / re-render', title:'Framework re-render', sub:'JS work, then a DOM commit, then the pipeline.',
+  chips:['main thread','batched'], pipeline:[1,1,1,1,1],
+  trace:[['stack','Your event handler calls setState. React queues the update, does not render yet.'],['micro','Batched updates flush in a microtask after the handler returns.'],['stack','Render phase: components run, virtual tree diffed.'],['heap','Lots of short-lived objects. GC pressure if renders are frequent.'],['dom','Commit phase: real DOM mutated synchronously.'],['style','Browser marks mutated nodes dirty.'],['layout','Reflow at the next frame, or immediately if you read a layout property.'],['paint','Repaint.'],['composite','Compose and draw.']],
+  gotcha:'Nothing paints until your JS yields. A 200ms render means 200ms of frozen UI, no matter how fast the DOM commit is.'},
+ {g:'JavaScript', c:'js', id:'thrash', code:'el.style.width = …; el.offsetWidth', title:'Layout thrashing', sub:'Forced synchronous layout.',
+  chips:['forced layout','main thread'], pipeline:[1,1,1,0,0],
+  trace:[['stack','You write a style. Browser just marks layout dirty, cheap.'],['dom','Then you read offsetWidth.'],['style','To answer accurately the browser must recalc style now.'],['layout','And run layout now, synchronously, inside your JS. Repeat in a loop and layout runs per iteration.'],['stack','Your function continues with the value.']],
+  gotcha:'Batch reads then writes. Libraries like fastdom exist only for this. DevTools flags it as "Forced reflow".'},
+ {g:'JavaScript', c:'js', id:'timeout', code:'setTimeout vs Promise.then', title:'Task vs microtask', sub:'Why the order is what it is.',
+  chips:['event loop'], pipeline:[1,0,0,0,0],
+  trace:[['stack','Script calls setTimeout(fn, 0) then Promise.resolve().then(g).'],['webapi','Timer handed to the browser timer API.'],['micro','g is queued as a microtask.'],['stack','Current script runs to completion, stack empties.'],['loop','Event loop drains the entire microtask queue first. g runs.'],['task','Timer fires, fn pushed as a macrotask.'],['raf','Rendering opportunity may happen between tasks, never between microtasks.'],['stack','fn runs on the next turn.']],
+  gotcha:'An infinite microtask chain starves rendering forever. An infinite setTimeout chain still lets frames through.'},
+ {g:'JavaScript', c:'js', id:'raf', code:'requestAnimationFrame(cb)', title:'Animation frame', sub:'Runs right before the pipeline.',
+  chips:['frame aligned'], pipeline:[1,1,1,1,1],
+  trace:[['stack','Callback registered.'],['raf','At the next vsync the browser runs all rAF callbacks once, before style.'],['style','Then style...'],['layout','...layout...'],['paint','...paint...'],['composite','...composite. Your changes land in this frame, not the next.']],
+  gotcha:'Reading layout inside rAF is fine. Doing it inside a scroll handler before rAF forces layout twice per frame.'},
+ {g:'Input', c:'input', id:'click', code:"addEventListener('click')", title:'User click', sub:'From hardware to your handler.',
+  chips:['input latency'], pipeline:[1,0,0,0,0],
+  trace:[['browserp','OS delivers the mouse event to the browser process.'],['comp_thread','Compositor receives it first and decides whether the main thread needs to know.'],['hit','Hit test finds the element under the pointer.'],['task','Event dispatch queued as a task on the main thread.'],['loop','Waits for whatever JS is currently running to finish. This wait is your Interaction to Next Paint.'],['stack','Capture, target, bubble: your handler runs.']],
+  gotcha:'Long tasks before the click delay it. Tasks over 50ms show up as poor INP.'},
+ {g:'Input', c:'input', id:'scroll', code:'scroll (and passive listeners)', title:'Scrolling', sub:'Normally never touches your JS.',
+  chips:['compositor thread','off main thread'], pipeline:[0,0,0,0,1],
+  trace:[['comp_thread','Wheel or touch event handled on the compositor thread.'],['composite','Layer offset updated, already-rasterised tiles reused.'],['gpu','New frame drawn. Main thread may be completely blocked and scroll still works.'],['task','Only afterwards a scroll event is queued for your listeners.']],
+  gotcha:'A non-passive wheel or touch listener forces the compositor to wait for your JS before scrolling. Use {passive:true}.'},
+ {g:'Network', c:'net', id:'fetch', code:"fetch('/api/items')", title:'Fetch an API', sub:'Async by design, CORS in the way.',
+  chips:['async','non-blocking'], pipeline:[1,0,0,0,0],
+  trace:[['stack','fetch() returns a Promise immediately.'],['webapi','Request handed to the browser network stack.'],['cors','Cross-origin? Browser checks the method and headers, may send an OPTIONS preflight first.'],['sw','If a service worker is registered it sees the request before the network.'],['cache','HTTP cache checked using Cache-Control and ETag.'],['tcp','Connection reused if keep-alive or HTTP/2 stream.'],['net_resp','Response headers arrive. Body streams.'],['micro','Promise resolution queued as a microtask.'],['loop','Your .then or await continuation runs when the stack is empty.'],['stack','You parse JSON and update state.']],
+  gotcha:'The preflight is a whole extra round trip. Custom headers like Authorization trigger it. Simple GETs do not.'},
+ {g:'Network', c:'net', id:'dynimport', code:"await import('./chart.js')", title:'Dynamic import', sub:'Code splitting at runtime.',
+  chips:['async','lazy'], pipeline:[1,0,0,0,0],
+  trace:[['stack','import() returns a promise, execution continues.'],['jsparse','Module loader resolves the URL and fetches it plus its dependency graph.'],['cache','Hashed filenames make these cacheable forever.'],['v8','Module parsed and compiled, often off main thread.'],['micro','Linked and evaluated, promise resolves as a microtask.'],['stack','Your code runs with the module namespace.']],
+  gotcha:'Waterfalls: a module that imports a module that imports a module. Preload hints or bundler chunking flatten this.'},
+ {g:'Storage', c:'store', id:'localstorage', code:"localStorage.setItem()", title:'localStorage write', sub:'Synchronous and blocking.',
+  chips:['sync','main thread'], pipeline:[1,0,0,0,0],
+  trace:[['stack','Call is synchronous. Nothing else happens until it returns.'],['ls','Value serialised to a string and written. Disk IO on the renderer or browser process.'],['stack','Returns. A big write on a slow disk freezes the frame.']],
+  gotcha:'Use IndexedDB for anything beyond a few KB. It is async and works in workers.'},
+ {g:'Storage', c:'store', id:'swfetch', code:'service worker fetch event', title:'Offline-first request', sub:'A proxy that lives in a worker.',
+  chips:['worker thread','async'], pipeline:[0,0,0,0,0],
+  trace:[['stack','Page calls fetch() like normal.'],['sw','Service worker fetch handler intercepts on its own thread.'],['cacheapi','Looks in the Cache API. Hit: respond instantly.'],['tcp','Miss: go to network.'],['net_resp','Response cloned into the cache for next time.'],['micro','Page-side promise resolves.']],
+  gotcha:'The first visit has no service worker. Registration happens after load, so install is a second-visit story.'},
+];
+
+// ---------- STATE ----------
+let current = null, timers = [];
+const reduced = matchMedia('(prefers-reduced-motion: reduce)').matches;
+const $ = s=>document.querySelector(s);
+
+// ---------- ACTION LIST ----------
+(function buildActions(){
+  const host=$('#actions'); let lastG='';
+  ACTIONS.forEach(a=>{
+    if(a.g!==lastG){ const l=document.createElement('div'); l.className='group-label'; l.textContent=a.g; host.appendChild(l); lastG=a.g; }
+    const b=document.createElement('button'); b.className='action'; b.id='act-'+a.id; b.setAttribute('aria-pressed','false');
+    b.style.setProperty('--c',`var(--c-${a.c})`);
+    b.innerHTML=`<span class="dot"></span><code>${a.code.replace(/</g,'&lt;')}</code>`;
+    b.addEventListener('click',()=>run(a)); host.appendChild(b);
+  });
+})();
+
+// ---------- SVG MAP ----------
+const svg=$('#map'), NS='http://www.w3.org/2000/svg';
+const el=(t,attrs={})=>{const e=document.createElementNS(NS,t);for(const k in attrs)e.setAttribute(k,attrs[k]);return e;};
+const gEdges=el('g',{id:'edges'}), gGhost=el('g',{id:'ghost'}), gNodes=el('g',{id:'nodes'}), gSpark=el('g');
+for(const [id,g] of Object.entries(GROUPS)){
+  const [x,y,w,h]=g.box;
+  const r=el('rect',{class:'region',x,y,width:w,height:h,style:`--c:${g.color}`}); svg.appendChild(r);
+  const t=el('text',{class:'region-label',x:x+10,y:y+16,style:`--c:${g.color}`}); t.textContent=g.name; svg.appendChild(t);
+}
+svg.append(gGhost,gEdges,gNodes,gSpark);
+const NW=110,NH=26;
+NODES.forEach(n=>{
+  const g=el('g',{class:'node',id:'n-'+n.id,style:`--c:${GROUPS[n.g].color}`});
+  g.appendChild(el('rect',{x:n.x,y:n.y,width:NW,height:NH}));
+  const t=el('text',{x:n.x+NW/2,y:n.y+NH/2+4,'text-anchor':'middle'}); t.textContent=n.label; g.appendChild(t);
+  g.addEventListener('mouseenter',()=>{ if(current) return; // hover a node: show which actions touch it
+    ACTIONS.forEach(a=>{ if(a.trace.some(s=>s[0]===n.id)) $('#act-'+a.id).style.background='var(--surface-2)'; }); });
+  g.addEventListener('mouseleave',()=>{ if(current) return; ACTIONS.forEach(a=>$('#act-'+a.id).style.background=''); });
+  gNodes.appendChild(g);
+});
+// ghost edges: union of every trace, so the map hints at connections at rest
+const seen=new Set();
+ACTIONS.forEach(a=>{ for(let i=1;i<a.trace.length;i++){ const k=a.trace[i-1][0]+'>'+a.trace[i][0]; if(seen.has(k)||a.trace[i-1][0]===a.trace[i][0]) continue; seen.add(k); gGhost.appendChild(edgePath(a.trace[i-1][0],a.trace[i][0],'edge ghost')); } });
+
+function center(id){const n=N[id];return [n.x+NW/2,n.y+NH/2];}
+function edgePath(a,b,cls){
+  const [x1,y1]=center(a),[x2,y2]=center(b); const dx=x2-x1, dy=y2-y1, mx=x1+dx/2, my=y1+dy/2;
+  const nx=-dy, ny=dx, len=Math.hypot(nx,ny)||1, bend=Math.min(60,Math.hypot(dx,dy)*0.18);
+  const cx=mx+nx/len*bend, cy=my+ny/len*bend;
+  return el('path',{class:cls,d:`M${x1},${y1} Q${cx},${cy} ${x2},${y2}`});
+}
+
+// ---------- RUN A TRACE ----------
+function reset(){
+  timers.forEach(clearTimeout); timers=[]; gEdges.innerHTML=''; gSpark.innerHTML='';
+  document.querySelectorAll('.node').forEach(n=>n.classList.remove('active','touched','pulse'));
+  document.querySelectorAll('.action').forEach(b=>{b.setAttribute('aria-pressed','false');b.style.background='';});
+}
+function run(a){
+  reset(); current=a; $('#act-'+a.id).setAttribute('aria-pressed','true');
+  renderTrace(a);
+  const stepMs = reduced?0:420;
+  a.trace.forEach(([id],i)=>{
+    timers.push(setTimeout(()=>{
+      document.querySelectorAll('.node.active').forEach(n=>{n.classList.remove('active');n.classList.add('touched');});
+      const node=$('#n-'+id); node.classList.add('active'); node.classList.remove('pulse'); void node.getBBox(); node.classList.add('pulse');
+      if(i>0){ const p=edgePath(a.trace[i-1][0],id,'edge'); gEdges.appendChild(p);
+        if(!reduced){ const L=p.getTotalLength(); p.style.strokeDasharray=L; p.style.strokeDashoffset=L; p.style.transition=`stroke-dashoffset ${stepMs*0.8}ms ease-out`; requestAnimationFrame(()=>p.style.strokeDashoffset=0);
+          const s=el('circle',{class:'spark',r:4}); gSpark.appendChild(s); const t0=performance.now();
+          (function tick(now){ const k=Math.min(1,(now-t0)/(stepMs*0.8)); const pt=p.getPointAtLength(L*k); s.setAttribute('cx',pt.x); s.setAttribute('cy',pt.y); if(k<1) requestAnimationFrame(tick); else s.remove(); })(t0);
+        } }
+      const st=document.querySelectorAll('#trace .step')[i]; if(st){ st.classList.add('on'); st.scrollIntoView({block:'nearest',behavior:reduced?'auto':'smooth'}); }
+      if(three.ready) three.setProgress(i);
+    }, i*stepMs));
+  });
+  if(three.ready) three.setTrace(a);
+}
+function renderTrace(a){
+  const g=GROUPS[a.c]?.color || `var(--c-${a.c})`;
+  $('#trace').innerHTML=`
+    <h2>${a.title}</h2><p class="sub">${a.sub}</p>
+    <div class="chips">${a.chips.map(c=>`<span class="chip ${/main thread|blocks|forced|sync|layout/.test(c)&&!/off main/.test(c)?'warn':/compositor|off main|async|60fps|lazy/.test(c)?'good':''}">${c}</span>`).join('')}</div>
+    <ol class="steps">${a.trace.map(([id,txt],i)=>`<li class="step" style="--c:${GROUPS[N[id].g].color}"><span class="n">${i+1}</span><div><b>${N[id].label}</b><p>${txt}</p></div></li>`).join('')}</ol>
+    <div class="pipe"><div class="lbl">Render pipeline stages this touches</div>
+      <div class="stages">${STAGES.map((s,i)=>`<div class="stage ${a.pipeline[i]?'hit':'skip'}">${s}</div>`).join('')}</div></div>
+    <div class="gotcha"><b>Gotcha</b>${a.gotcha}</div>`;
+}
+$('#trace').innerHTML=`<h2>Pick an action</h2><p class="sub">Each one on the left is something you type as a frontend dev. The map shows which parts of the browser it wakes up, in order.</p>
+  <div class="gotcha"><b>Idea</b>Hover a browser part to see which actions touch it. Switch to Recall to test yourself before looking.</div>`;
+
+// ---------- TABS ----------
+document.querySelectorAll('[role=tab]').forEach(t=>t.addEventListener('click',()=>{
+  document.querySelectorAll('[role=tab]').forEach(x=>x.setAttribute('aria-selected',x===t));
+  ['map','recall','notes'].forEach(k=>$('#tab-'+k).hidden = k!==t.dataset.tab);
+  if(t.dataset.tab==='recall') newQuestion();
+  if(t.dataset.tab==='map' && three.ready) three.resize();
+}));
+
+// ---------- RECALL ----------
+let q=null, picked=new Set(), streak=0;
+function newQuestion(){
+  q=ACTIONS[Math.floor(Math.random()*ACTIONS.length)]; picked=new Set();
+  $('#tab-recall').innerHTML=`<h2>Predict before you look</h2>
+    <p class="q">You write <code>${q.code.replace(/</g,'&lt;')}</code>. Which render pipeline stages run on the main thread?</p>
+    <div class="opts" id="opts">${STAGES.map((s,i)=>`<button class="opt" aria-pressed="false" data-i="${i}">${s}</button>`).join('')}</div>
+    <div class="row"><button class="btn" id="check">Check</button><button class="btn ghost" id="show">Show me the trace</button><span class="streak">streak ${streak}</span></div>
+    <div class="result" id="result"></div>`;
+  $('#opts').addEventListener('click',e=>{ const b=e.target.closest('.opt'); if(!b) return; const i=+b.dataset.i; picked.has(i)?picked.delete(i):picked.add(i); b.setAttribute('aria-pressed',picked.has(i)); });
+  $('#check').addEventListener('click',()=>{
+    let ok=true; document.querySelectorAll('.opt').forEach(b=>{ const i=+b.dataset.i, should=!!q.pipeline[i], did=picked.has(i); if(should!==did) ok=false; b.classList.add(should?'right':(did?'wrong':'')); });
+    streak = ok? streak+1 : 0; document.querySelector('.streak').textContent='streak '+streak;
+    $('#result').innerHTML = ok ? 'Correct. '+q.gotcha+' <button class="btn ghost" id="next">Next</button>' : 'Not quite. Green is what actually runs. '+q.gotcha+' <button class="btn ghost" id="next">Next</button>';
+    $('#next').addEventListener('click',newQuestion);
+  });
+  $('#show').addEventListener('click',()=>{ document.querySelector('[data-tab=map]').click(); run(q); });
+}
+
+// ---------- 3D PREVIEW (optional, same data) ----------
+const three={ready:false};
+(function init3d(){
+  if(!window.THREE){ $('#three-note').textContent='three.js did not load in this sandbox; 2D map still works.'; return; }
+  const host=$('#three-host');
+  const scene=new THREE.Scene();
+  const cam=new THREE.PerspectiveCamera(45,1000/640,0.1,200); cam.position.set(0,6,22);
+  const renderer=new THREE.WebGLRenderer({antialias:true,alpha:true}); renderer.setPixelRatio(Math.min(devicePixelRatio,2)); host.prepend(renderer.domElement);
+  scene.add(new THREE.AmbientLight(0xffffff,0.6)); const pl=new THREE.PointLight(0xffffff,40); pl.position.set(5,10,10); scene.add(pl);
+  const colors={net:0x4fb3ff,parse:0xb48cff,render:0xff7a59,js:0xffd166,store:0x4ade80,input:0xf472b6};
+  const zOf={net:-3,parse:0,input:2,render:1,js:-2,store:3};
+  const pos={}; const meshes={};
+  const geo=new THREE.SphereGeometry(0.32,20,20);
+  NODES.forEach(n=>{ const p=new THREE.Vector3((n.x+NW/2-500)/45, -(n.y+NH/2-320)/45, zOf[n.g]); pos[n.id]=p;
+    const m=new THREE.Mesh(geo,new THREE.MeshStandardMaterial({color:colors[n.g],emissive:colors[n.g],emissiveIntensity:0.15,roughness:.4})); m.position.copy(p); scene.add(m); meshes[n.id]=m;
+    const c=document.createElement('canvas'); c.width=256; c.height=48; const x=c.getContext('2d'); x.font='500 24px IBM Plex Sans, sans-serif'; x.fillStyle='#e8eef6'; x.textAlign='center'; x.fillText(n.label,128,32);
+    const sp=new THREE.Sprite(new THREE.SpriteMaterial({map:new THREE.CanvasTexture(c),transparent:true,depthTest:false})); sp.scale.set(2.6,.5,1); sp.position.copy(p).add(new THREE.Vector3(0,.55,0)); scene.add(sp); });
+  // ghost edges in one geometry
+  const gpts=[]; seen.forEach(k=>{const [a,b]=k.split('>'); gpts.push(pos[a],pos[b]);});
+  scene.add(new THREE.LineSegments(new THREE.BufferGeometry().setFromPoints(gpts),new THREE.LineBasicMaterial({color:0x3a4a66,transparent:true,opacity:.5})));
+  let traceLine=null, path=[], prog=-1; const spark=new THREE.Mesh(new THREE.SphereGeometry(.14,12,12),new THREE.MeshBasicMaterial({color:0xffb454})); spark.visible=false; scene.add(spark);
+  three.setTrace=a=>{ if(traceLine){scene.remove(traceLine);} path=a.trace.map(s=>pos[s[0]]);
+    traceLine=new THREE.Line(new THREE.BufferGeometry().setFromPoints(path),new THREE.LineBasicMaterial({color:0xffb454})); scene.add(traceLine); prog=-1;
+    Object.values(meshes).forEach(m=>m.material.emissiveIntensity=.15); dirty=true; };
+  three.setProgress=i=>{ prog=i; path.forEach((p,j)=>{ const id=current.trace[j][0]; meshes[id].material.emissiveIntensity = j<=i? (j===i?1.2:.5) : .15; }); sparkT=0; dirty=true; };
+  let sparkT=1, dirty=true, dragging=false, theta=0, phi=.25, lx=0, ly=0;
+  host.addEventListener('pointerdown',e=>{dragging=true;lx=e.clientX;ly=e.clientY;});
+  addEventListener('pointerup',()=>dragging=false);
+  addEventListener('pointermove',e=>{ if(!dragging) return; theta-=(e.clientX-lx)*.006; phi=Math.max(-1.2,Math.min(1.2,phi+(e.clientY-ly)*.006)); lx=e.clientX; ly=e.clientY; dirty=true; });
+  three.resize=()=>{ const w=host.clientWidth||1000; renderer.setSize(w,w*0.64,false); dirty=true; };
+  addEventListener('resize',three.resize);
+  let visible=false; new IntersectionObserver(en=>{visible=en[0].isIntersecting; dirty=true;},{threshold:.05}).observe(host);
+  function frame(){ requestAnimationFrame(frame); if(document.hidden||!visible||host.style.display==='none') return;
+    const animating = sparkT<1 && prog>0;
+    if(!dirty && !animating) return; dirty=false;
+    if(animating){ sparkT=Math.min(1,sparkT+(reduced?1:.06)); spark.visible=true; spark.position.lerpVectors(path[prog-1],path[prog],sparkT); if(sparkT>=1) spark.visible=false; }
+    const r=22; cam.position.set(r*Math.sin(theta)*Math.cos(phi), r*Math.sin(phi)+1, r*Math.cos(theta)*Math.cos(phi)); cam.lookAt(0,0,0);
+    renderer.render(scene,cam); }
+  frame(); three.ready=true;
+})();
+document.querySelectorAll('[data-view]').forEach(b=>b.addEventListener('click',()=>{
+  document.querySelectorAll('[data-view]').forEach(x=>x.setAttribute('aria-pressed',x===b));
+  const is3d=b.dataset.view==='3d'; svg.style.display=is3d?'none':''; $('#three-host').style.display=is3d?'block':'none';
+  if(is3d && three.ready){ three.resize(); if(current) three.setTrace(current), three.setProgress(current.trace.length-1); }
+}));
+</script>
