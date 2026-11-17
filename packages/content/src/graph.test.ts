@@ -3,9 +3,9 @@ import { describe, expect, it } from 'vitest';
 import { graph } from './index.ts';
 
 describe('compiled content', () => {
-  it('keeps at least the concepts and relations ported from mockup v3', () => {
+  it('keeps at least the concepts and relations ported from mockup v3 (minus two duplicates)', () => {
     expect(graph.nodes.length).toBeGreaterThanOrEqual(144);
-    expect(graph.edges.length).toBeGreaterThanOrEqual(278);
+    expect(graph.edges.length).toBeGreaterThanOrEqual(276);
   });
 
   it('has concepts in every domain', () => {
