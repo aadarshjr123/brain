@@ -16,6 +16,7 @@
   "devDependencies": {
     "@brain/config": "workspace:*",
     "@brain/content": "workspace:*",
+    "@types/d3-force": "3.0.10",
     "eslint": "9.39.5",
     "typescript": "6.0.3",
     "vitest": "5.1.0"
@@ -26,5 +27,8 @@
       "prettier --write"
     ],
     "*.{json,css,md,yaml,yml}": "prettier --write"
+  },
+  "dependencies": {
+    "d3-force": "3.0.1"
   }
 }
