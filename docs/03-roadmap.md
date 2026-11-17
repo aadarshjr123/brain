@@ -2,15 +2,15 @@
 
 Milestones are gates: a milestone closes with a demo, a retro in `journal/`, and all its tickets Done or explicitly moved.
 
-| Milestone | Outcome | Target |
-|---|---|---|
-| **M0 Foundation** | Repo, CI, deploy pipeline, docs, empty app live on Vercel | Week 1 |
-| **M1 Engine + content** | Graph engine package with tests; content ported and validated; validator in CI | Week 2 |
-| **M2 Explore** | The v3 mockup rebuilt as the real app: unfold, focus, search, legend, trail, card, themes, URL state, local progress | Weeks 3–4 |
-| **M3 Route + reference** | Route mode with animation; concept pages; cheatsheet; OG images; offline shell | Weeks 5–6 |
-| **M4 Launch** | Accessibility audit, perf budgets met, content ≥150 nodes with sources, README, CONTRIBUTING, public launch post | Week 7 |
-| **M5 Learn (post-launch)** | Recall quiz, spaced repetition, mastery tint on map, export/import | Later |
-| **M6 Scale (post-launch)** | Weighted routes, paged unfold, worker layout, optional 3D view | Later |
+| Milestone                  | Outcome                                                                                                              | Target    |
+| -------------------------- | -------------------------------------------------------------------------------------------------------------------- | --------- |
+| **M0 Foundation**          | Repo, CI, deploy pipeline, docs, empty app live on Vercel                                                            | Week 1    |
+| **M1 Engine + content**    | Graph engine package with tests; content ported and validated; validator in CI                                       | Week 2    |
+| **M2 Explore**             | The v3 mockup rebuilt as the real app: unfold, focus, search, legend, trail, card, themes, URL state, local progress | Weeks 3–4 |
+| **M3 Route + reference**   | Route mode with animation; concept pages; cheatsheet; OG images; offline shell                                       | Weeks 5–6 |
+| **M4 Launch**              | Accessibility audit, perf budgets met, content ≥150 nodes with sources, README, CONTRIBUTING, public launch post     | Week 7    |
+| **M5 Learn (post-launch)** | Recall quiz, spaced repetition, mastery tint on map, export/import                                                   | Later     |
+| **M6 Scale (post-launch)** | Weighted routes, paged unfold, worker layout, optional 3D view                                                       | Later     |
 
 ## Epics by milestone
 
