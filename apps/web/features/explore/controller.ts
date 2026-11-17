@@ -18,6 +18,7 @@ import { type ZoomBehavior, zoom, zoomIdentity } from 'd3-zoom';
 
 import { EXPLORE } from './config';
 import { readFonts, readPalette } from './palette';
+import { type SearchIndex, createSearchIndex } from './search';
 import { type ExploreStore, createExploreStore } from './store';
 
 export interface ControllerOptions {
@@ -36,7 +37,9 @@ export class ExploreController {
   readonly graph: Graph<ConceptNode>;
   readonly store: ExploreStore;
   readonly domains: readonly string[];
+  readonly #domainNames: ReadonlyMap<string, string>;
   readonly layout: Layout;
+  readonly search: SearchIndex;
   #reduced: boolean;
   #now: () => number;
   #renderer: Renderer<ConceptNode> | null = null;
@@ -47,6 +50,8 @@ export class ExploreController {
   constructor({ content, reducedMotion = false, random, now }: ControllerOptions) {
     this.graph = buildGraph(content.nodes, content.edges);
     this.domains = content.domains.map((d) => d.id);
+    this.#domainNames = new Map(content.domains.map((d) => [d.id, d.name]));
+    this.search = createSearchIndex(content.nodes, (id) => this.graph.degree(id));
     this.store = createExploreStore(this.domains);
     this.#reduced = reducedMotion;
     this.#now = now ?? (() => performance.now());
@@ -63,6 +68,10 @@ export class ExploreController {
 
   concept(id: string): ConceptNode | undefined {
     return this.graph.nodes.get(id);
+  }
+
+  domainName(domain: string): string {
+    return this.#domainNames.get(domain) ?? domain;
   }
 
   hiddenCount(id: string): number {
