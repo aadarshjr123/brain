@@ -1,4 +1,8 @@
+import { graph } from '@brain/content';
 import { type Page, expect } from '@playwright/test';
+
+/** Concept count from the content, so tests do not break when concepts are added. */
+export const TOTAL = graph.nodes.length;
 
 interface BrainHandle {
   settled: boolean;

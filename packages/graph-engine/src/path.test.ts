@@ -62,7 +62,8 @@ describe('routes over the real content', () => {
         if (hops <= 7) within++;
       }
     }
-    // 2026-11-17: 98.4% within 7 hops; the longest route is 11 (prototype → sse).
+    // 2026-11-17: 98.4% within 7 hops (longest 11) at 144 concepts; after the content drive's cross-links,
+    // 99.6% within 7 (longest 9) at 152 concepts.
     expect(within / pairs).toBeGreaterThanOrEqual(0.95);
   });
 });

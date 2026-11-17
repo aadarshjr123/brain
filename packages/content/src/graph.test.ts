@@ -13,6 +13,15 @@ describe('compiled content', () => {
     expect(graph.domains.map((d) => d.id).filter((d) => !used.has(d))).toEqual([]);
   });
 
+  it('meets the PRD content target: at least 150 concepts and 300 relations', () => {
+    expect(graph.nodes.length).toBeGreaterThanOrEqual(150);
+    expect(graph.edges.length).toBeGreaterThanOrEqual(300);
+  });
+
+  it('cites at least one https source for every concept', () => {
+    for (const n of graph.nodes) expect(n.sources.length, n.id).toBeGreaterThan(0);
+  });
+
   it('gives every concept a summary and a verified date', () => {
     for (const n of graph.nodes) {
       expect(n.summary.length, n.id).toBeGreaterThanOrEqual(20);

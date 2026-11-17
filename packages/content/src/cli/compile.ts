@@ -10,8 +10,8 @@ import { fileURLToPath } from 'node:url';
 import { ContentError, loadContent } from '../load.ts';
 import { type Severity, validateGraph } from '../validate.ts';
 
-/** Missing sources warn until the M4 content drive turns this to 'error'. */
-const MISSING_SOURCES: Severity = 'warning';
+/** Every concept must cite a source (M4 content drive, BRAIN-32). */
+const MISSING_SOURCES: Severity = 'error';
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '..', '..');
 const out = join(root, 'generated', 'graph.json');
