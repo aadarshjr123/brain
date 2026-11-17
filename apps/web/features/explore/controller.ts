@@ -17,6 +17,7 @@ import 'd3-transition';
 import { type ZoomBehavior, zoom, zoomIdentity } from 'd3-zoom';
 
 import { EXPLORE } from './config';
+import { ARROWS, pickInDirection } from './direction';
 import { readFonts, readPalette } from './palette';
 import { type SearchIndex, createSearchIndex } from './search';
 import { type ExploreStore, createExploreStore } from './store';
@@ -222,6 +223,76 @@ export class ExploreController {
       },
       this.#reduced ? 0 : MOTION.fitDelayMs,
     );
+  }
+
+  // ---------------- keyboard ----------------
+
+  /**
+   * Keyboard on the focused canvas: arrows move to the neighbour in that direction (or, with nothing selected,
+   * start at the concept nearest the middle of the screen), Enter unfolds, Escape clears, + and - zoom.
+   * Returns whether the key was handled, so the caller can preventDefault.
+   */
+  handleKey(key: string): boolean {
+    const s = this.store.getState();
+    const dir = ARROWS[key];
+    if (dir) {
+      const current = s.selectedId ? this.layout.get(s.selectedId) : undefined;
+      let next: string | undefined;
+      if (!current) {
+        next = this.#nearestToCentre();
+      } else {
+        const candidates = this.graph
+          .neighbours(current.id)
+          .map((n) => this.layout.get(n.id))
+          .filter((n) => n !== undefined);
+        next = pickInDirection(current, candidates, dir)?.id;
+      }
+      if (next) {
+        this.select(next);
+        this.center(next);
+      }
+      return true;
+    }
+    switch (key) {
+      case 'Enter':
+      case ' ':
+        if (s.selectedId) this.open(s.selectedId);
+        else {
+          const id = this.#nearestToCentre();
+          if (id) this.select(id);
+        }
+        return true;
+      case 'Escape':
+        this.select(null);
+        return true;
+      case '+':
+      case '=':
+        this.zoomIn();
+        return true;
+      case '-':
+        this.zoomOut();
+        return true;
+      default:
+        return false;
+    }
+  }
+
+  #nearestToCentre(): string | undefined {
+    const size = this.#renderer?.size;
+    const t = this.#renderer?.transform;
+    if (!size || !t) return this.layout.nodes()[0]?.id;
+    const cx = (size.width / 2 - t.x) / t.k;
+    const cy = (size.height / 2 - t.y) / t.k;
+    let best: string | undefined;
+    let bestD = Infinity;
+    for (const n of this.layout.nodes()) {
+      const d = Math.hypot(n.x - cx, n.y - cy);
+      if (d < bestD) {
+        bestD = d;
+        best = n.id;
+      }
+    }
+    return best;
   }
 
   // ---------------- links ----------------

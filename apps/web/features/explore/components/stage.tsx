@@ -18,8 +18,14 @@ export function Stage() {
   return (
     <canvas
       ref={ref}
-      className="block size-full cursor-grab touch-none data-dragging:cursor-grabbing"
-      aria-label="Concept map. Use the search box or the cheatsheet for a text version."
+      // Focusable so the map works from the keyboard; the live region announces what is selected.
+      tabIndex={0}
+      aria-label="Concept map"
+      aria-describedby="map-help"
+      onKeyDown={(e) => {
+        if (controller.handleKey(e.key)) e.preventDefault();
+      }}
+      className="block size-full cursor-grab touch-none outline-none focus-visible:outline-2 focus-visible:-outline-offset-4 focus-visible:outline-ring data-dragging:cursor-grabbing"
     />
   );
 }
