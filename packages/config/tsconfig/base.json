@@ -8,6 +8,8 @@
     "moduleResolution": "Bundler",
     "moduleDetection": "force",
     "resolveJsonModule": true,
+    "allowArbitraryExtensions": true,
+    "allowImportingTsExtensions": true,
     "isolatedModules": true,
     "verbatimModuleSyntax": true,
     "esModuleInterop": true,

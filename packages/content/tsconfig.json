@@ -1,4 +1,9 @@
 {
   "extends": "@brain/config/tsconfig/library.json",
-  "include": ["src"]
+  "compilerOptions": {
+    // The compiler runs under Node's type stripping, so only erasable syntax is allowed.
+    "erasableSyntaxOnly": true,
+    "types": ["node"]
+  },
+  "include": ["src", "generated"]
 }

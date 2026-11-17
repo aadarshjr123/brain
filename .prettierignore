@@ -5,3 +5,4 @@ mockup/
 **/coverage/
 **/.turbo/
 **/next-env.d.ts
+packages/content/generated
