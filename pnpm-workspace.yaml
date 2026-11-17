@@ -1,0 +1,6 @@
+packages:
+  - apps/*
+  - packages/*
+
+# Exact versions on `pnpm add` so the lockfile and package.json never disagree.
+saveExact: true

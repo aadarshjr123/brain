@@ -1,0 +1,18 @@
+{
+  "name": "@brain/graph-engine",
+  "version": "0.0.0",
+  "private": true,
+  "description": "Framework-free graph engine: graph model, routing, force layout and canvas renderer.",
+  "type": "module",
+  "sideEffects": false,
+  "exports": {
+    ".": "./src/index.ts"
+  },
+  "scripts": {
+    "typecheck": "tsc --noEmit"
+  },
+  "devDependencies": {
+    "@brain/config": "workspace:*",
+    "typescript": "6.0.3"
+  }
+}
