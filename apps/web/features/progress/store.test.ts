@@ -21,6 +21,7 @@ const freshDb = () => {
   dbs.push(db);
   return db;
 };
+const source = (db: BrainDb | null) => () => Promise.resolve(db);
 afterEach(async () => {
   for (const db of dbs.splice(0)) await db.delete();
 });
@@ -34,7 +35,7 @@ const persisted = async (db: BrainDb, events: number, bookmarks = 0) => {
 
 describe('progress reducers', () => {
   it('folds views into a per-concept summary', () => {
-    const store = makeProgressStore(null);
+    const store = makeProgressStore(source(null));
     store.dispatch(conceptViewed('dom', 100));
     store.dispatch(conceptViewed('dom', 300));
     store.dispatch(conceptViewed('v8', 200));
@@ -43,7 +44,7 @@ describe('progress reducers', () => {
   });
 
   it('toggles bookmarks', () => {
-    const store = makeProgressStore(null);
+    const store = makeProgressStore(source(null));
     store.dispatch(bookmarkToggled('dom'));
     store.dispatch(bookmarkToggled('v8'));
     store.dispatch(bookmarkToggled('dom'));
@@ -54,8 +55,8 @@ describe('progress reducers', () => {
 describe('persistence', () => {
   it('writes through to IndexedDB and a new session replays it', async () => {
     const db = freshDb();
-    const first = makeProgressStore(db);
-    await hydrate(first, db);
+    const first = makeProgressStore(source(db));
+    await hydrate(first, source(db));
     first.dispatch(conceptViewed('dom', 1));
     first.dispatch(conceptViewed('dom', 2));
     first.dispatch(bookmarkToggled('event_loop'));
@@ -65,8 +66,8 @@ describe('persistence', () => {
       expect((await db.settings.get('settings'))?.value.theme).toBe('light');
     });
 
-    const second = makeProgressStore(db);
-    await hydrate(second, db);
+    const second = makeProgressStore(source(db));
+    await hydrate(second, source(db));
     const s = second.getState();
     expect(s.progress.seen.dom?.count).toBe(2);
     expect(s.bookmarks.ids).toEqual(['event_loop']);
@@ -75,8 +76,8 @@ describe('persistence', () => {
   });
 
   it('keeps working in memory when storage is unavailable', async () => {
-    const store = makeProgressStore(null);
-    await hydrate(store, null);
+    const store = makeProgressStore(source(null));
+    await hydrate(store, source(null));
     store.dispatch(conceptViewed('dom'));
     expect(store.getState().session.storage).toBe('unavailable');
     expect(selectExploredCount(store.getState())).toBe(1);
@@ -88,8 +89,8 @@ describe('persistence', () => {
     Object.defineProperty(db, 'events', {
       get: () => ({ orderBy: () => ({ toArray: () => Promise.reject(new Error('blocked')) }) }),
     });
-    const store = makeProgressStore(db);
-    await hydrate(store, db);
+    const store = makeProgressStore(source(db));
+    await hydrate(store, source(db));
     expect(store.getState().session.storage).toBe('unavailable');
   });
 });
@@ -108,26 +109,26 @@ describe('isUnavailable', () => {
 describe('export and import', () => {
   it('round-trips through a JSON file into a different browser', async () => {
     const a = freshDb();
-    const storeA = makeProgressStore(a);
-    await hydrate(storeA, a);
+    const storeA = makeProgressStore(source(a));
+    await hydrate(storeA, source(a));
     storeA.dispatch(conceptViewed('dom', 10));
     storeA.dispatch(conceptViewed('v8', 20));
     storeA.dispatch(bookmarkToggled('v8'));
     await persisted(a, 2, 1);
-    const file = JSON.stringify(await exportBackup(storeA, a));
+    const file = JSON.stringify(await exportBackup(storeA, source(a)));
 
     const b = freshDb();
-    const storeB = makeProgressStore(b);
-    await hydrate(storeB, b);
+    const storeB = makeProgressStore(source(b));
+    await hydrate(storeB, source(b));
     const backup = parseBackup(file);
     if ('error' in backup) throw new Error(backup.error);
-    await importBackup(storeB, b, backup);
+    await importBackup(storeB, source(b), backup);
     expect(selectExploredCount(storeB.getState())).toBe(2);
     expect(storeB.getState().bookmarks.ids).toEqual(['v8']);
 
     // and it persisted in B
-    const storeB2 = makeProgressStore(b);
-    await hydrate(storeB2, b);
+    const storeB2 = makeProgressStore(source(b));
+    await hydrate(storeB2, source(b));
     expect(selectExploredCount(storeB2.getState())).toBe(2);
   });
 

@@ -8,14 +8,13 @@ import { useController } from '@/features/explore/context';
 
 import { ThemeToggle } from '@/features/theme/theme-toggle';
 
-import { parseBackup } from './backup';
 import { useAppSelector, useProgressContext } from './provider';
 import { exportBackup, importBackup, selectExploredCount } from './store';
 
 /** Your progress: counts, bookmarks, and a backup you can carry to another browser. */
 export function ProgressPanel() {
   const c = useController();
-  const { store, db } = useProgressContext();
+  const { store, getDb } = useProgressContext();
   const explored = useAppSelector(selectExploredCount);
   const marks = useAppSelector((s) => s.bookmarks.ids);
   const storage = useAppSelector((s) => s.session.storage);
@@ -25,7 +24,7 @@ export function ProgressPanel() {
   const total = c.graph.nodes.size;
 
   const download = async () => {
-    const backup = await exportBackup(store, db);
+    const backup = await exportBackup(store, getDb);
     const url = URL.createObjectURL(
       new Blob([JSON.stringify(backup, null, 2)], { type: 'application/json' }),
     );
@@ -38,12 +37,14 @@ export function ProgressPanel() {
   };
 
   const upload = async (f: File) => {
+    // The validator (Zod) loads only when someone imports a file.
+    const { parseBackup } = await import('./backup');
     const parsed = parseBackup(await f.text());
     if ('error' in parsed) {
       setMessage(parsed.error);
       return;
     }
-    await importBackup(store, db, parsed);
+    await importBackup(store, getDb, parsed);
     setMessage(
       `Imported ${String(parsed.events.length)} views and ${String(parsed.bookmarks.length)} bookmarks.`,
     );
@@ -54,7 +55,8 @@ export function ProgressPanel() {
       <button
         type="button"
         popoverTarget={panelId}
-        aria-label={`Your progress: ${String(explored)} of ${String(total)} explored`}
+        // The accessible name contains the visible text ("2/144"), so voice control users can say what they see.
+        aria-label={`Your progress: ${String(explored)}/${String(total)} explored`}
         title="Your progress"
         className="flex h-[38px] items-center gap-1.5 glass px-3 text-xs text-muted-foreground hover:text-foreground"
       >

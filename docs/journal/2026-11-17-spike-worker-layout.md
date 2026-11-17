@@ -52,3 +52,15 @@ change is a `WorkerLayout` with the same surface that posts a `Float32Array` bac
 
 Draw cost in a real browser canvas. Node has no canvas. BRAIN-30 adds a frame-timing check in Chromium through
 Playwright; its numbers get appended here.
+
+## Update from BRAIN-30: draw cost in a real browser
+
+The e2e suite measures frames with `requestAnimationFrame` while unfolding the whole map (144 nodes, all edges
+growing, labels drawing) in Chromium:
+
+| Frame time during "unfold everything" | p50     | p95     |
+| ------------------------------------- | ------- | ------- |
+| Local, Apple Silicon, Chromium 158    | 16.7 ms | 16.8 ms |
+
+That is a steady 60 Hz with layout and drawing together. The decision above stands. The check runs in CI on
+every PR (it fails above a p95 of 50 ms, loose because CI runners are shared), so a regression shows up there first.

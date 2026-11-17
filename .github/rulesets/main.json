@@ -42,6 +42,9 @@
           },
           {
             "context": "commits"
+          },
+          {
+            "context": "e2e"
           }
         ]
       }

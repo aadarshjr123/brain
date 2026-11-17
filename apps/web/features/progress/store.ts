@@ -4,6 +4,9 @@ import { captureException } from '@/lib/observability/sentry';
 
 import type { Backup } from './backup';
 import type { BrainDb } from './db';
+
+/** IndexedDB opens lazily: Dexie loads in its own chunk after first paint, never on a page's critical path. */
+export type DbSource = () => Promise<BrainDb | null>;
 import {
   bookmarkToggled,
   bookmarks,
@@ -22,7 +25,7 @@ import {
  * Domain state (ADR-0006): progress, bookmarks, settings and session in Redux Toolkit.
  * Listener middleware writes each change to IndexedDB. If storage fails, the app keeps working in memory.
  */
-export function makeProgressStore(db: BrainDb | null) {
+export function makeProgressStore(getDb: DbSource) {
   const listener = createListenerMiddleware();
   const store = configureStore({
     reducer: {
@@ -34,13 +37,16 @@ export function makeProgressStore(db: BrainDb | null) {
     middleware: (getDefault) => getDefault().prepend(listener.middleware),
   });
 
-  if (db) {
-    const safely = (write: () => Promise<unknown>) => write().catch(() => undefined);
+  {
+    const safely = async (write: (db: BrainDb) => Promise<unknown>) => {
+      const db = await getDb().catch(() => null);
+      if (db) await write(db).catch(() => undefined);
+    };
     listener.startListening({
       actionCreator: conceptViewed,
       effect: async (action) => {
         // A copy: Dexie writes the generated id back onto the object, and Redux actions are frozen.
-        await safely(() => db.events.add({ ...action.payload }));
+        await safely((db) => db.events.add({ ...action.payload }));
       },
     });
     listener.startListening({
@@ -48,13 +54,13 @@ export function makeProgressStore(db: BrainDb | null) {
       effect: async (action, api) => {
         const id = action.payload;
         const on = (api.getState() as RootState).bookmarks.ids.includes(id);
-        await safely(() => (on ? db.bookmarks.put({ id, ts: Date.now() }) : db.bookmarks.delete(id)));
+        await safely((db) => (on ? db.bookmarks.put({ id, ts: Date.now() }) : db.bookmarks.delete(id)));
       },
     });
     listener.startListening({
       actionCreator: themeChanged,
       effect: async (_action, api) => {
-        await safely(() =>
+        await safely((db) =>
           db.settings.put({ key: 'settings', value: (api.getState() as RootState).settings }),
         );
       },
@@ -68,7 +74,8 @@ export type RootState = ReturnType<ProgressStore['getState']>;
 export type AppDispatch = ProgressStore['dispatch'];
 
 /** Load everything from IndexedDB into Redux by replaying events. Marks storage unavailable instead of throwing. */
-export async function hydrate(store: ProgressStore, db: BrainDb | null): Promise<void> {
+export async function hydrate(store: ProgressStore, getDb: DbSource): Promise<void> {
+  const db = await getDb().catch(() => null);
   if (!db) {
     store.dispatch(hydrated('unavailable'));
     return;
@@ -104,8 +111,9 @@ export function isUnavailable(error: unknown): boolean {
   return error instanceof Error && UNAVAILABLE.has(error.name);
 }
 
-export async function exportBackup(store: ProgressStore, db: BrainDb | null): Promise<Backup> {
+export async function exportBackup(store: ProgressStore, getDb: DbSource): Promise<Backup> {
   const state = store.getState();
+  const db = await getDb().catch(() => null);
   const events = db
     ? await db.events
         .orderBy('ts')
@@ -123,7 +131,8 @@ export async function exportBackup(store: ProgressStore, db: BrainDb | null): Pr
 }
 
 /** Replace everything with a backup, in storage first and then in memory. */
-export async function importBackup(store: ProgressStore, db: BrainDb | null, backup: Backup): Promise<void> {
+export async function importBackup(store: ProgressStore, getDb: DbSource, backup: Backup): Promise<void> {
+  const db = await getDb().catch(() => null);
   if (db) {
     await db
       .transaction('rw', [db.events, db.bookmarks, db.settings], async () => {
