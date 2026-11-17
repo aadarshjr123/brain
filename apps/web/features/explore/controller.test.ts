@@ -114,4 +114,23 @@ describe('ExploreController (no DOM)', () => {
     expect(c.store.getState().selectedId).toBeNull();
     expect(c.serialiseUrl()).toBe('');
   });
+
+  it('keyboard: Escape clears, Enter opens the selection, arrows move to a neighbour', () => {
+    const c = make();
+    c.select('event_loop');
+    expect(c.handleKey('Enter')).toBe(true);
+    const before = c.store.getState().visible.size;
+    expect(before).toBeGreaterThan(EXPLORE.seeds.length);
+    const moved = ['ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight'].some((k) => {
+      c.select('event_loop');
+      c.handleKey(k);
+      return c.store.getState().selectedId !== 'event_loop';
+    });
+    expect(moved).toBe(true);
+    const now = c.store.getState().selectedId ?? '';
+    expect(c.graph.relationBetween('event_loop', now)).toBeDefined();
+    expect(c.handleKey('Escape')).toBe(true);
+    expect(c.store.getState().selectedId).toBeNull();
+    expect(c.handleKey('q')).toBe(false);
+  });
 });

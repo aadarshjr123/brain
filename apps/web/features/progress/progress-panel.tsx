@@ -6,6 +6,8 @@ import { useId, useRef, useState } from 'react';
 import { domainStyle } from '@/features/explore/components/domain-style';
 import { useController } from '@/features/explore/context';
 
+import { ThemeToggle } from '@/features/theme/theme-toggle';
+
 import { parseBackup } from './backup';
 import { useAppSelector, useProgressContext } from './provider';
 import { exportBackup, importBackup, selectExploredCount } from './store';
@@ -131,6 +133,10 @@ export function ProgressPanel() {
             }}
           />
         </div>
+        <h3 className="mt-4 mb-1.5 font-mono text-[10px] tracking-[0.1em] text-muted-foreground uppercase">
+          Theme
+        </h3>
+        <ThemeToggle className="w-fit" />
         <p role="status" className="mt-2 min-h-5 text-xs text-muted-foreground">
           {message}
         </p>

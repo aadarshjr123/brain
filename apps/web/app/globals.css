@@ -231,3 +231,15 @@
 :root[data-theme='light'] .glass {
   box-shadow: 0 10px 30px rgb(20 30 50 / 0.12);
 }
+
+/* Honour reduced motion everywhere the DOM animates; the canvas reads the same preference. */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}

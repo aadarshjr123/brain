@@ -4,6 +4,7 @@ import type { Metadata, Viewport } from 'next';
 import { Bricolage_Grotesque, IBM_Plex_Mono, IBM_Plex_Sans } from 'next/font/google';
 
 import { ProgressProvider } from '@/features/progress/provider';
+import { themeScript } from '@/features/theme/theme';
 import { siteUrl } from '@/lib/site';
 import { cn } from '@/lib/utils';
 
@@ -47,8 +48,19 @@ export const viewport: Viewport = {
 
 export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
   return (
-    <html lang="en" className={cn(display.variable, sans.variable, mono.variable)}>
+    // suppressHydrationWarning: the head script may set data-theme before React hydrates.
+    <html lang="en" suppressHydrationWarning className={cn(display.variable, sans.variable, mono.variable)}>
+      <head>
+        {/* Applies the saved theme before first paint, so there is no flash. Allowed by hash in the CSP. */}
+        <script dangerouslySetInnerHTML={{ __html: themeScript }} />
+      </head>
       <body className="min-h-dvh">
+        <a
+          href="#main"
+          className="fixed top-2 left-2 z-50 -translate-y-20 rounded-lg bg-primary px-3 py-2 font-medium text-primary-foreground focus:translate-y-0"
+        >
+          Skip to content
+        </a>
         <ProgressProvider>{children}</ProgressProvider>
         {/* Vercel serves these scripts from its edge, so they only exist in Vercel builds. No cookies, no personal identifiers. */}
         {process.env.VERCEL === '1' && (

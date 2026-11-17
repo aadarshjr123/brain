@@ -10,20 +10,41 @@ import { Stage } from '@/features/explore/components/stage';
 import { Toast } from '@/features/explore/components/toast';
 import { Tools } from '@/features/explore/components/tools';
 import { Trail } from '@/features/explore/components/trail';
-import { ExploreProvider, useController } from '@/features/explore/context';
+import { ExploreProvider, useController, useExplore } from '@/features/explore/context';
 import { ProgressBridge } from '@/features/progress/progress-bridge';
 import { ProgressPanel } from '@/features/progress/progress-panel';
+import { ThemeToggle } from '@/features/theme/theme-toggle';
 
 export function ExploreView() {
   return (
     <ExploreProvider>
-      <main className="fixed inset-0 overflow-hidden bg-background px-4">
+      <main id="main" className="fixed inset-0 overflow-hidden bg-background px-4">
         <h1 className="sr-only">Brain concept map</h1>
+        <p id="map-help" className="sr-only">
+          Arrow keys move between connected concepts, Enter unfolds the selected one, Escape clears, plus and
+          minus zoom. The cheatsheet lists every concept as text.
+        </p>
         <Stage />
+        <Announcer />
         <Overlay />
         <ProgressBridge />
       </main>
     </ExploreProvider>
+  );
+}
+
+/** Screen readers hear what the map is showing, since the canvas itself is silent. */
+function Announcer() {
+  const c = useController();
+  const selectedId = useExplore((s) => s.selectedId);
+  const node = selectedId ? c.concept(selectedId) : undefined;
+  const text = node
+    ? `${node.label}, ${c.domainName(node.domain)}. ${String(c.graph.degree(node.id))} connections, ${String(c.hiddenCount(node.id))} not yet on the map.`
+    : '';
+  return (
+    <p aria-live="polite" className="sr-only">
+      {text}
+    </p>
   );
 }
 
@@ -51,6 +72,7 @@ function Overlay() {
         </div>
         <div className="col-start-2 row-start-1 flex items-center gap-2 justify-self-end sm:col-start-3">
           <ProgressPanel />
+          <ThemeToggle className="hidden lg:flex" />
           <Tools />
         </div>
       </div>
