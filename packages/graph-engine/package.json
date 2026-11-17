@@ -11,12 +11,14 @@
   "scripts": {
     "typecheck": "tsc --noEmit",
     "lint": "eslint . --max-warnings=0",
-    "test": "vitest run --passWithNoTests"
+    "test": "vitest run --passWithNoTests",
+    "bench": "node bench/layout.bench.ts"
   },
   "devDependencies": {
     "@brain/config": "workspace:*",
     "@brain/content": "workspace:*",
     "@types/d3-force": "3.0.10",
+    "@types/node": "24.19.2",
     "eslint": "9.39.5",
     "typescript": "6.0.3",
     "vitest": "5.1.0"
