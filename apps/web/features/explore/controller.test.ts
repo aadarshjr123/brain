@@ -97,4 +97,21 @@ describe('ExploreController (no DOM)', () => {
     c.select('dom');
     expect(c.scene().focus).toBe(true);
   });
+
+  it('restores a link: layers, then selection with its neighbours unfolded', () => {
+    const c = make();
+    c.applyUrlState(c.parseUrl('?n=gpu_process&layers=browser,net'));
+    const s = c.store.getState();
+    expect(s.selectedId).toBe('gpu_process');
+    expect(s.visible.has('gpu_process')).toBe(true);
+    expect([...s.activeDomains]).toEqual(['browser', 'net']);
+    expect(c.serialiseUrl()).toBe('?n=gpu_process&layers=browser,net');
+  });
+
+  it('ignores a link to a concept that does not exist', () => {
+    const c = make();
+    c.applyUrlState(c.parseUrl('?n=not_a_concept'));
+    expect(c.store.getState().selectedId).toBeNull();
+    expect(c.serialiseUrl()).toBe('');
+  });
 });

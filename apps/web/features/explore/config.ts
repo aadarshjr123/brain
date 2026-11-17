@@ -8,4 +8,6 @@ export const EXPLORE = {
   toastMs: 2200,
   /** The seeds repel each other on load; fit the view once they have spread. */
   initialFitMs: 900,
+  /** Address bar updates wait for the user to settle on something. */
+  urlDebounceMs: 300,
 } as const;

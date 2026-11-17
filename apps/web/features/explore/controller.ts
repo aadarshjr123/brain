@@ -20,6 +20,7 @@ import { EXPLORE } from './config';
 import { readFonts, readPalette } from './palette';
 import { type SearchIndex, createSearchIndex } from './search';
 import { type ExploreStore, createExploreStore } from './store';
+import { type UrlState, parseUrlState, serialiseUrlState } from './url-state';
 
 export interface ControllerOptions {
   content: ContentGraph;
@@ -223,6 +224,37 @@ export class ExploreController {
     );
   }
 
+  // ---------------- links ----------------
+
+  /** Restore a shared link: layers first, then the selected concept. Unknown values were dropped by the parser. */
+  applyUrlState(state: UrlState): void {
+    if (state.layers) this.store.getState().setDomains(state.layers);
+    if (state.n) {
+      this.reveal(state.n);
+      this.open(state.n);
+    }
+  }
+
+  /** The part of the state worth putting in a link. */
+  urlState(): UrlState {
+    const s = this.store.getState();
+    const state: UrlState = {};
+    if (s.selectedId) state.n = s.selectedId;
+    if (s.activeDomains.size < this.domains.length) state.layers = [...s.activeDomains];
+    return state;
+  }
+
+  parseUrl(search: string): UrlState {
+    return parseUrlState(search, {
+      concept: (id) => this.graph.has(id),
+      domain: (d) => this.domains.includes(d),
+    });
+  }
+
+  serialiseUrl(state: UrlState = this.urlState()): string {
+    return serialiseUrlState(state, this.domains);
+  }
+
   // ---------------- DOM wiring ----------------
 
   /** Mounts the renderer on a canvas and wires gestures. Returns a cleanup function. */
@@ -338,18 +370,37 @@ export class ExploreController {
       renderer.invalidate();
     });
 
+    // A shared link restores its state; the first view then centres on the linked concept or fits the seeds.
+    this.applyUrlState(this.parseUrl(window.location.search));
     renderer.start();
     const firstFit = setTimeout(
       () => {
-        this.fit();
+        const { selectedId } = this.store.getState();
+        if (selectedId) this.center(selectedId);
+        else this.fit();
       },
       this.#reduced ? 0 : EXPLORE.initialFitMs,
     );
 
+    // Keep the address bar in step without adding history entries.
+    let urlTimer: ReturnType<typeof setTimeout> | undefined;
+    const unsubscribeUrl = this.store.subscribe((state, previous) => {
+      if (state.selectedId === previous.selectedId && state.activeDomains === previous.activeDomains) return;
+      clearTimeout(urlTimer);
+      urlTimer = setTimeout(() => {
+        const next = `${window.location.pathname}${this.serialiseUrl()}${window.location.hash}`;
+        if (next !== `${window.location.pathname}${window.location.search}${window.location.hash}`) {
+          window.history.replaceState(window.history.state, '', next);
+        }
+      }, EXPLORE.urlDebounceMs);
+    });
+
     this.#detach = [
       () => {
         clearTimeout(firstFit);
+        clearTimeout(urlTimer);
       },
+      unsubscribeUrl,
       () => {
         ro.disconnect();
       },
