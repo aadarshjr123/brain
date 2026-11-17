@@ -91,7 +91,7 @@
     and push.
   verified: 2026-11-16
 - id: early_hints
-  label: "103 Early Hints"
+  label: '103 Early Hints'
   summary: >-
     Server sends preload hints before the real response so the browser starts fetching CSS and fonts
     during server think time.

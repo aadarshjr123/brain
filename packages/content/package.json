@@ -29,7 +29,7 @@
       "eslint --fix --max-warnings=0",
       "prettier --write"
     ],
-    "*.{json,css,md}": "prettier --write"
+    "*.{json,css,md,yaml,yml}": "prettier --write"
   },
   "dependencies": {
     "yaml": "2.9.1",

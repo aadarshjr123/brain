@@ -263,7 +263,7 @@
 - [ssr, ttfb, adds server work to]
 - [ssr, fcp, improves]
 - [ssr, streaming_ssr, evolves into]
-- [hydration, inp, "blocks input until done, hurting"]
+- [hydration, inp, 'blocks input until done, hurting']
 - [hydration, v8, executes whole bundle in]
 - [hydration, islands, is partial in]
 - [hydration, rsc, is reduced by]
