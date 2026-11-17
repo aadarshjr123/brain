@@ -1,0 +1,4 @@
+{
+  "extends": "@brain/config/tsconfig/library.json",
+  "include": ["src"]
+}

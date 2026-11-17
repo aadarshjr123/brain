@@ -1,0 +1,21 @@
+{
+  "name": "brain",
+  "private": true,
+  "description": "A public study map of how frontend development touches the browser.",
+  "packageManager": "pnpm@11.6.0",
+  "engines": {
+    "node": ">=24"
+  },
+  "scripts": {
+    "dev": "turbo run dev",
+    "build": "turbo run build",
+    "lint": "turbo run lint",
+    "typecheck": "turbo run typecheck",
+    "test": "turbo run test",
+    "check": "turbo run typecheck lint test"
+  },
+  "devDependencies": {
+    "turbo": "2.11.11",
+    "typescript": "6.0.3"
+  }
+}
