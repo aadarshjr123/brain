@@ -1,6 +1,7 @@
 import type { Metadata, Viewport } from 'next';
 import { Bricolage_Grotesque, IBM_Plex_Mono, IBM_Plex_Sans } from 'next/font/google';
 
+import { siteUrl } from '@/lib/site';
 import { cn } from '@/lib/utils';
 
 import './globals.css';
@@ -25,6 +26,7 @@ const mono = IBM_Plex_Mono({
 });
 
 export const metadata: Metadata = {
+  metadataBase: siteUrl,
   title: {
     default: 'Brain',
     template: '%s · Brain',
