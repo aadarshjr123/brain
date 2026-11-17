@@ -9,10 +9,19 @@
     ".": "./src/index.ts"
   },
   "scripts": {
-    "typecheck": "tsc --noEmit"
+    "typecheck": "tsc --noEmit",
+    "lint": "eslint . --max-warnings=0"
   },
   "devDependencies": {
     "@brain/config": "workspace:*",
+    "eslint": "9.39.5",
     "typescript": "6.0.3"
+  },
+  "lint-staged": {
+    "*.{ts,tsx,js,mjs}": [
+      "eslint --fix --max-warnings=0",
+      "prettier --write"
+    ],
+    "*.{json,css,md}": "prettier --write"
   }
 }
