@@ -72,7 +72,7 @@ function Overlay() {
 
   return (
     <>
-      <div className="pointer-events-none absolute inset-x-4 top-2.5 z-[4] grid grid-cols-[1fr_auto] items-center gap-2.5 sm:top-3.5 sm:grid-cols-[auto_minmax(0,1fr)_auto] [&>*]:pointer-events-auto">
+      <div className="pointer-events-none absolute inset-x-3 top-2.5 z-[4] grid grid-cols-[1fr_auto] items-center gap-2.5 sm:inset-x-4 sm:top-3.5 sm:grid-cols-[auto_minmax(0,1fr)_auto_auto] [&>*]:pointer-events-auto">
         <div className="col-start-1 row-start-1 justify-self-start">
           <Brand />
         </div>
@@ -83,6 +83,9 @@ function Overlay() {
           <ModeSwitch />
           <ProgressPanel />
           <ThemeToggle className="hidden lg:flex" />
+        </div>
+        {/* Phones: a vertical strip under the search box, so the top row fits in 360 px. */}
+        <div className="col-start-2 row-start-3 justify-self-end sm:col-start-4 sm:row-start-1">
           <Tools />
         </div>
       </div>

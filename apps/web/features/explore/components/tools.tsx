@@ -8,7 +8,7 @@ import { IconButton } from './icon-button';
 export function Tools() {
   const c = useController();
   return (
-    <div className="flex gap-0.5 glass p-[3px]" role="toolbar" aria-label="Map controls">
+    <div className="flex flex-col gap-0.5 glass p-[3px] sm:flex-row" role="toolbar" aria-label="Map controls">
       <IconButton
         label="Zoom in"
         onClick={() => {
