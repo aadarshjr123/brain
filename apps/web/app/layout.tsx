@@ -3,6 +3,7 @@ import { SpeedInsights } from '@vercel/speed-insights/next';
 import type { Metadata, Viewport } from 'next';
 import { Bricolage_Grotesque, IBM_Plex_Mono, IBM_Plex_Sans } from 'next/font/google';
 
+import { RegisterServiceWorker } from '@/features/offline/register';
 import { ProgressProvider } from '@/features/progress/provider';
 import { themeScript } from '@/features/theme/theme';
 import { siteUrl } from '@/lib/site';
@@ -67,6 +68,7 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
           Skip to content
         </a>
         <ProgressProvider>{children}</ProgressProvider>
+        <RegisterServiceWorker />
         {/* Vercel serves these scripts from its edge, so they only exist in Vercel builds. No cookies, no personal identifiers. */}
         {process.env.VERCEL === '1' && (
           <>

@@ -8,6 +8,18 @@ const nextConfig: NextConfig = {
   // Link hrefs are checked against real routes at build time.
   typedRoutes: true,
   poweredByHeader: false,
+  headers() {
+    return Promise.resolve([
+      {
+        // The worker must never be cached by the browser's HTTP cache, or new deploys would not reach users.
+        source: '/sw.js',
+        headers: [
+          { key: 'Cache-Control', value: 'no-cache, no-store, must-revalidate' },
+          { key: 'Service-Worker-Allowed', value: '/' },
+        ],
+      },
+    ]);
+  },
 };
 
 // Source maps are uploaded to Sentry only when a token is present (Vercel production and preview).

@@ -32,7 +32,7 @@ flowchart LR
     E --> Z[Zustand engine store]
     E --> X[Redux: progress, settings]
     X --> D[(Dexie / IndexedDB)]
-    SW[Serwist service worker] --> DOM
+    SW[Service worker, ADR-0010] --> DOM
     SW --> E
   end
   CDN[Vercel edge CDN] --> browser
@@ -81,7 +81,7 @@ There is no application server. Everything is built at deploy time and served fr
 
 ### 3.7 Offline
 
-- Serwist precaches the app shell, explore bundle and `graph.json`; runtime-caches concept pages stale-while-revalidate.
+- A hand-written service worker (ADR-0010): pages network-first with an offline copy, hashed assets cache-first, other same-origin files stale-while-revalidate. The content ships inside the explore bundle, so caching the bundle caches the graph.
 
 ## 4. Data model
 
