@@ -21,6 +21,12 @@ export function SiteHeader() {
           >
             Map
           </Link>
+          <Link
+            href="/cheatsheet"
+            className="rounded-lg px-3 py-1.5 text-muted-foreground hover:bg-secondary hover:text-foreground"
+          >
+            Cheatsheet
+          </Link>
         </nav>
         <ThemeToggle className="hidden sm:flex" />
       </div>
