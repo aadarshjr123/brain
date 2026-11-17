@@ -1,8 +1,8 @@
-// Fails when a package that must exist once in the install has two versions.
+// Fails when a package that must exist once in the install resolves to two versions.
 // Two copies of typescript-eslint made ESLint refuse to load (learning issue #24);
 // two copies of React or Zustand break hooks and shared stores at runtime.
-// Reads pnpm's virtual store, so it checks what is installed, not what package.json asks for.
-import { readdirSync } from 'node:fs';
+// Reads the `packages:` section of pnpm-lock.yaml, which is exactly what `pnpm install --frozen-lockfile` installs.
+import { readFileSync } from 'node:fs';
 
 const MUST_BE_SINGLE = [
   'typescript-eslint',
@@ -15,20 +15,21 @@ const MUST_BE_SINGLE = [
   'd3-force',
 ];
 
-const store = readdirSync('node_modules/.pnpm');
+const lock = readFileSync('pnpm-lock.yaml', 'utf8');
+const section = lock.split(/^packages:\n/m)[1]?.split(/^\S/m)[0] ?? '';
+// Keys look like `  react@19.3.1:` or `  '@typescript-eslint/parser@8.73.0':`
+const keys = [...section.matchAll(/^ {2}'?(@?[^@'\s]+)@([^:'(\s]+)/gm)];
+
 let failed = false;
 for (const name of MUST_BE_SINGLE) {
-  const prefix = `${name.replace('/', '+')}@`;
-  const versions = new Set(
-    store.filter((dir) => dir.startsWith(prefix)).map((dir) => dir.slice(prefix.length).split('_')[0]),
-  );
+  const versions = new Set(keys.filter(([, n]) => n === name).map(([, , v]) => v));
   if (versions.size > 1) {
     failed = true;
-    console.error(`✗ ${name} is installed in ${versions.size} versions: ${[...versions].join(', ')}`);
+    console.error(`✗ ${name} resolves to ${versions.size} versions: ${[...versions].join(', ')}`);
   }
 }
 if (failed) {
   console.error('Align the versions, or add a pnpm override in pnpm-workspace.yaml.');
   process.exit(1);
 }
-console.log(`✓ ${MUST_BE_SINGLE.length} packages are single-version`);
+console.log(`✓ ${MUST_BE_SINGLE.length} packages resolve to a single version`);
