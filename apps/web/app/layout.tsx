@@ -37,6 +37,11 @@ export const metadata: Metadata = {
   },
   description:
     'A free study map of how frontend development touches the browser. Explore concepts, see what they connect to, and trace cause and effect.',
+  applicationName: 'Brain',
+  icons: { icon: [{ url: '/icon.svg', type: 'image/svg+xml' }] },
+  openGraph: { type: 'website', siteName: 'Brain', locale: 'en' },
+  twitter: { card: 'summary_large_image' },
+  alternates: { canonical: '/' },
 };
 
 export const viewport: Viewport = {
