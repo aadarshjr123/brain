@@ -1,4 +1,4 @@
-import { readdirSync, readFileSync } from 'node:fs';
+import { existsSync, readdirSync, readFileSync } from 'node:fs';
 import { basename, join, relative } from 'node:path';
 
 import { parse } from 'yaml';
@@ -66,7 +66,9 @@ export function loadContent(dir: string): ContentGraph {
   const edges = parseFile('edges.yaml', EdgesFileSchema) ?? [];
 
   const nodes: ConceptNode[] = [];
-  const nodeFiles = readdirSync(join(dir, 'nodes'))
+  // Git does not track empty folders, so a fresh checkout with no concepts yet has no nodes/ at all.
+  const nodesDir = join(dir, 'nodes');
+  const nodeFiles = (existsSync(nodesDir) ? readdirSync(nodesDir) : [])
     .filter((f) => f.endsWith('.yaml'))
     .sort();
   for (const file of nodeFiles) {

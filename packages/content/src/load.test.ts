@@ -44,6 +44,13 @@ describe('loadContent', () => {
     }
   });
 
+  it('treats a missing nodes/ folder as no concepts', () => {
+    const dir = mkdtempSync(join(tmpdir(), 'brain-content-'));
+    writeFileSync(join(dir, 'domains.yaml'), domains);
+    writeFileSync(join(dir, 'edges.yaml'), '[]');
+    expect(loadContent(dir).nodes).toEqual([]);
+  });
+
   it('reports YAML syntax errors with the file name', () => {
     const dir = fixture({ 'domains.yaml': 'a: [unclosed', 'edges.yaml': '[]' });
     expect(() => loadContent(dir)).toThrow(/domains\.yaml: YAML syntax error/);
