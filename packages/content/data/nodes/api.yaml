@@ -1,0 +1,66 @@
+# web apis
+- id: intersection_observer
+  label: IntersectionObserver
+  summary: >-
+    Async visibility notifications. Replaces scroll listeners for lazy loading and infinite scroll.
+  verified: 2026-11-16
+- id: resize_observer
+  label: ResizeObserver
+  summary: >-
+    Fires after layout, before paint, when an element’s size changes. Container queries in JS.
+  verified: 2026-11-16
+- id: mutation_observer
+  label: MutationObserver
+  summary: >-
+    Fires as a microtask after DOM changes.
+  verified: 2026-11-16
+- id: history_api
+  label: History API
+  summary: >-
+    pushState and popstate. What client-side routers are built on.
+  verified: 2026-11-16
+- id: navigation_api
+  label: Navigation API
+  summary: >-
+    Newer router primitive: intercept navigations, get a single event for all of them.
+  verified: 2026-11-16
+- id: performance_api
+  label: Performance API
+  summary: >-
+    performance.now, marks, measures and PerformanceObserver for long tasks, LCP, layout shifts.
+  verified: 2026-11-16
+- id: web_animations
+  label: Web Animations API
+  summary: >-
+    element.animate(). Compositor-driven when animating transform or opacity.
+  verified: 2026-11-16
+- id: view_transitions
+  label: View Transitions API
+  summary: >-
+    Snapshot old state, animate to new. Cross-document version works on navigation.
+  verified: 2026-11-16
+- id: shadow_dom
+  label: Shadow DOM & custom elements
+  summary: >-
+    Encapsulated subtree with scoped styles. The platform’s component model.
+  verified: 2026-11-16
+- id: canvas
+  label: Canvas / WebGL / WebGPU
+  summary: >-
+    Immediate-mode drawing. Bypasses DOM, style and layout. You own the frame.
+  verified: 2026-11-16
+- id: css_containment
+  label: CSS containment & content-visibility
+  summary: >-
+    Tell the browser a subtree is independent so style and layout can skip it. Huge wins on long pages.
+  verified: 2026-11-16
+- id: scheduler_yield
+  label: scheduler.yield / postTask
+  summary: >-
+    Break long tasks by yielding to the event loop with priority. Input gets in between chunks.
+  verified: 2026-11-16
+- id: broadcast_channel
+  label: BroadcastChannel
+  summary: >-
+    Message other tabs of the same origin.
+  verified: 2026-11-16

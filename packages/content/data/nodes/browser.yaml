@@ -1,0 +1,190 @@
+# processes & threads
+- id: browser_process
+  label: Browser process
+  summary: >-
+    The parent process. Owns the UI (address bar, tabs), navigation, and brokers network and storage for
+    renderers.
+  verified: 2026-11-16
+- id: renderer_process
+  label: Renderer process
+  summary: >-
+    One per site (site isolation). Runs the main thread, compositor thread and worker threads for a tab.
+  verified: 2026-11-16
+- id: gpu_process
+  label: GPU process
+  summary: >-
+    Talks to the graphics driver. Receives compositor frames and draws them to the screen.
+  verified: 2026-11-16
+- id: network_service
+  label: Network service
+  summary: >-
+    The process that actually does DNS, sockets, TLS and the HTTP cache on behalf of renderers.
+  verified: 2026-11-16
+- id: main_thread
+  label: Main thread
+  summary: >-
+    Where your JS, style, layout and paint all run. One thread, 16.7ms per frame at 60Hz. The thing you
+    are always fighting for.
+  verified: 2026-11-16
+- id: compositor_thread
+  label: Compositor thread
+  summary: >-
+    Assembles layers into a frame without the main thread. Handles scroll and compositor-only animations
+    even when JS is blocked.
+  verified: 2026-11-16
+- id: raster_threads
+  label: Raster threads
+  summary: >-
+    Turn paint display lists into pixel tiles, usually on the GPU. Only dirty tiles are redone.
+  verified: 2026-11-16
+- id: site_isolation
+  label: Site isolation
+  summary: >-
+    Each site gets its own renderer process so a compromised page cannot read another site’s memory
+    (Spectre defence).
+  verified: 2026-11-16
+
+# loading & parsing
+- id: navigation
+  label: Navigation
+  summary: >-
+    Browser process starts the request, picks or creates a renderer, then commits once headers arrive.
+  verified: 2026-11-16
+- id: html_parser
+  label: HTML parser
+  summary: >-
+    Tokenizer plus tree builder. Incremental: builds DOM as bytes stream in. Pauses on a classic script
+    tag.
+  verified: 2026-11-16
+- id: preload_scanner
+  label: Preload scanner
+  summary: >-
+    A lookahead parser that finds src and href attributes and starts fetches while the main parser is
+    blocked.
+  verified: 2026-11-16
+- id: css_parser
+  label: CSS parser
+  summary: >-
+    Turns stylesheets into CSSOM. Stylesheets are render-blocking: no paint until they are parsed.
+  verified: 2026-11-16
+- id: dom
+  label: DOM
+  summary: >-
+    The live tree of nodes. Every JS DOM API call is a message into this structure. Mutations mark it
+    dirty for style.
+  verified: 2026-11-16
+- id: cssom
+  label: CSSOM
+  summary: >-
+    Parsed stylesheet rules. Combined with DOM to resolve the cascade.
+  verified: 2026-11-16
+- id: bfcache
+  label: Back/forward cache
+  summary: >-
+    Keeps the whole page alive in memory when you navigate away so back is instant. Broken by unload
+    listeners and open connections.
+  verified: 2026-11-16
+
+# render pipeline
+- id: style_calc
+  label: Style recalculation
+  summary: >-
+    Matches selectors to nodes and computes the final value of every property. Cost grows with selector
+    complexity and tree size.
+  verified: 2026-11-16
+- id: layout
+  label: Layout (reflow)
+  summary: >-
+    Computes the geometry of every box. Changing width, font-size or adding nodes dirties it. Can
+    cascade across the whole tree.
+  verified: 2026-11-16
+- id: paint
+  label: Paint
+  summary: >-
+    Records draw commands (display list) per layer. Not pixels yet.
+  verified: 2026-11-16
+- id: layers
+  label: Compositing layers
+  summary: >-
+    Elements promoted to their own layer (transform, will-change, video) can move without repainting
+    others. Each costs GPU memory.
+  verified: 2026-11-16
+- id: composite
+  label: Composite
+  summary: >-
+    Compositor thread positions all layer tiles and ships a frame to the GPU.
+  verified: 2026-11-16
+- id: frame
+  label: Frame / vsync
+  summary: >-
+    The display refresh tick. The pipeline tries to produce one frame per tick. Miss it and you get
+    jank.
+  verified: 2026-11-16
+- id: forced_layout
+  label: Forced synchronous layout
+  summary: >-
+    Reading offsetWidth or getBoundingClientRect after a DOM write makes the browser run layout right
+    now, inside your JS.
+  verified: 2026-11-16
+- id: hit_test
+  label: Hit testing
+  summary: >-
+    Finds which element is under the pointer. Needs up-to-date layout.
+  verified: 2026-11-16
+- id: input_events
+  label: Input events
+  summary: >-
+    Mouse, touch, keyboard arrive in the browser process, go to the compositor, then queue a task on the
+    main thread.
+  verified: 2026-11-16
+- id: scroll
+  label: Scrolling
+  summary: >-
+    Handled on the compositor thread using already-rasterised tiles. Non-passive listeners force it to
+    wait for the main thread.
+  verified: 2026-11-16
+
+# event loop
+- id: event_loop
+  label: Event loop
+  summary: >-
+    The loop that picks one task, runs it to completion, drains all microtasks, then maybe renders.
+    Everything async funnels through here.
+  verified: 2026-11-16
+- id: task_queue
+  label: Task queue (macrotasks)
+  summary: >-
+    setTimeout callbacks, I/O, input events, message events. One task per loop turn, rendering may
+    happen between them.
+  verified: 2026-11-16
+- id: microtask_queue
+  label: Microtask queue
+  summary: >-
+    Promise reactions, queueMicrotask, MutationObserver. Drained completely after every task, before
+    rendering. Can starve the frame.
+  verified: 2026-11-16
+- id: raf
+  label: requestAnimationFrame
+  summary: >-
+    Callbacks run once per frame right before style and layout. The correct place for visual updates.
+  verified: 2026-11-16
+- id: ric
+  label: requestIdleCallback
+  summary: >-
+    Runs when the browser has nothing better to do. Deadline-based. Good for non-urgent work.
+  verified: 2026-11-16
+- id: timers
+  label: Timers
+  summary: >-
+    setTimeout and setInterval. Minimum 4ms when nested, throttled to 1s in background tabs.
+  verified: 2026-11-16
+- id: web_workers
+  label: Web Workers
+  summary: >-
+    Separate thread with its own event loop. No DOM access. Talk via postMessage and structured clone.
+  verified: 2026-11-16
+- id: long_task
+  label: Long task
+  summary: >-
+    Any task over 50ms. Blocks input, blocks rendering, hurts INP. The metric your profiler flags red.
+  verified: 2026-11-16

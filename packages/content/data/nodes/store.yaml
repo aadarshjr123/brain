@@ -1,0 +1,41 @@
+# network
+- id: cache_api
+  label: Cache API
+  summary: >-
+    Request/Response storage used by service workers. Async, promise-based.
+  verified: 2026-11-16
+
+# security
+- id: cookies
+  label: Cookies
+  summary: >-
+    Sent automatically with requests to their domain. HttpOnly hides them from JS, SameSite limits
+    cross-site sending.
+  verified: 2026-11-16
+
+# storage
+- id: localstorage
+  label: localStorage
+  summary: >-
+    Synchronous key-value strings, ~5MB, per origin. Blocks the main thread. Not available in workers.
+  verified: 2026-11-16
+- id: sessionstorage
+  label: sessionStorage
+  summary: >-
+    Same as localStorage but per tab and cleared when the tab closes.
+  verified: 2026-11-16
+- id: indexeddb
+  label: IndexedDB
+  summary: >-
+    Async transactional object store. Works in workers. Stores structured-clonable data.
+  verified: 2026-11-16
+- id: opfs
+  label: Origin private file system
+  summary: >-
+    Fast file access for an origin, mostly in workers. Used by SQLite-in-the-browser.
+  verified: 2026-11-16
+- id: storage_quota
+  label: Storage quota
+  summary: >-
+    Per-origin budget. Eviction happens under pressure unless persisted.
+  verified: 2026-11-16

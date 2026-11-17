@@ -1,0 +1,98 @@
+# network
+- id: dns
+  label: DNS
+  summary: >-
+    Hostname to IP. Cached at OS and browser level. dns-prefetch hint warms it.
+  verified: 2026-11-16
+- id: tcp
+  label: TCP
+  summary: >-
+    Reliable byte stream. One round trip to establish.
+  verified: 2026-11-16
+- id: tls
+  label: TLS
+  summary: >-
+    Encryption handshake on top of TCP. 1 to 2 more round trips. TLS 1.3 allows 0-RTT resumption.
+  verified: 2026-11-16
+- id: http1
+  label: HTTP/1.1
+  summary: >-
+    One request per connection at a time. Browsers open 6 per host to compensate.
+  verified: 2026-11-16
+- id: http2
+  label: HTTP/2
+  summary: >-
+    Multiplexes many streams over one connection. Header compression. Head-of-line blocking moves to
+    TCP.
+  verified: 2026-11-16
+- id: http3
+  label: HTTP/3 / QUIC
+  summary: >-
+    UDP based. No TCP head-of-line blocking, faster handshake, connection migration.
+  verified: 2026-11-16
+- id: http_cache
+  label: HTTP cache
+  summary: >-
+    Disk and memory cache keyed by URL. Cache-Control decides freshness; ETag enables cheap
+    revalidation.
+  verified: 2026-11-16
+- id: cache_control
+  label: Cache-Control & ETag
+  summary: >-
+    max-age, immutable, no-store, stale-while-revalidate. The headers that decide whether a request
+    leaves the device.
+  verified: 2026-11-16
+- id: cdn
+  label: CDN
+  summary: >-
+    Edge servers near users. Caches responses, terminates TLS close by, cuts TTFB.
+  verified: 2026-11-16
+- id: fetch
+  label: fetch()
+  summary: >-
+    Promise-based request API. Streams the body. Does not reject on HTTP errors.
+  verified: 2026-11-16
+- id: xhr
+  label: XMLHttpRequest
+  summary: >-
+    The older request API. Still the only one with upload progress events.
+  verified: 2026-11-16
+- id: websocket
+  label: WebSocket
+  summary: >-
+    Persistent bidirectional connection upgraded from HTTP.
+  verified: 2026-11-16
+- id: sse
+  label: Server-sent events
+  summary: >-
+    One-way server push over a long-lived HTTP response. Auto-reconnects.
+  verified: 2026-11-16
+- id: streams
+  label: Streams API
+  summary: >-
+    ReadableStream and friends. Process a response as chunks arrive instead of waiting for the whole
+    body.
+  verified: 2026-11-16
+- id: resource_hints
+  label: Resource hints
+  summary: >-
+    preload, preconnect, prefetch, modulepreload, dns-prefetch. Tell the browser about resources before
+    it discovers them.
+  verified: 2026-11-16
+- id: compression
+  label: Compression
+  summary: >-
+    gzip and brotli for text. Images and fonts need their own formats (AVIF, WOFF2).
+  verified: 2026-11-16
+- id: service_worker
+  label: Service worker
+  summary: >-
+    A programmable proxy in a worker thread. Intercepts fetches, serves from Cache API, enables offline
+    and push.
+  verified: 2026-11-16
+- id: early_hints
+  label: "103 Early Hints"
+  summary: >-
+    Server sends preload hints before the real response so the browser starts fetching CSS and fonts
+    during server think time.
+  verified: 2026-11-16
