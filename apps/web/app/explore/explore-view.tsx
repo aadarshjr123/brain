@@ -5,6 +5,9 @@ import { useEffect } from 'react';
 import { Brand } from '@/features/explore/components/brand';
 import { DetailCard } from '@/features/explore/components/detail-card';
 import { Legend } from '@/features/explore/components/legend';
+import { ModeSwitch } from '@/features/explore/components/mode-switch';
+import { RouteCard } from '@/features/explore/components/route-card';
+import { RoutePill } from '@/features/explore/components/route-pill';
 import { SearchBox } from '@/features/explore/components/search-box';
 import { Stage } from '@/features/explore/components/stage';
 import { Toast } from '@/features/explore/components/toast';
@@ -33,6 +36,12 @@ export function ExploreView() {
   );
 }
 
+/** In Route mode with a destination, the route card replaces the concept card. */
+function CardSlot() {
+  const showRoute = useExplore((s) => s.mode === 'route' && s.route.to !== null);
+  return showRoute ? <RouteCard /> : <DetailCard />;
+}
+
 /** Screen readers hear what the map is showing, since the canvas itself is silent. */
 function Announcer() {
   const c = useController();
@@ -53,7 +62,7 @@ function Overlay() {
   const c = useController();
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => {
-      if (e.key === 'Escape' && !(e.target instanceof HTMLInputElement)) c.select(null);
+      if (e.key === 'Escape' && !(e.target instanceof HTMLInputElement)) c.escape();
     };
     window.addEventListener('keydown', onKey);
     return () => {
@@ -71,6 +80,7 @@ function Overlay() {
           <SearchBox />
         </div>
         <div className="col-start-2 row-start-1 flex items-center gap-2 justify-self-end sm:col-start-3">
+          <ModeSwitch />
           <ProgressPanel />
           <ThemeToggle className="hidden lg:flex" />
           <Tools />
@@ -86,9 +96,12 @@ function Overlay() {
       <div className="absolute bottom-16 left-1/2 z-[3] -translate-x-1/2">
         <Toast />
       </div>
+      <div className="absolute top-[118px] left-1/2 z-[3] -translate-x-1/2 sm:top-[72px]">
+        <RoutePill />
+      </div>
 
       <div className="absolute inset-x-0 bottom-0 z-[4] max-h-[50%] md:inset-x-auto md:top-[66px] md:right-4 md:bottom-auto md:max-h-[calc(100%-92px)] md:w-[340px] [&>aside]:rounded-b-none md:[&>aside]:rounded-b-[var(--radius)]">
-        <DetailCard />
+        <CardSlot />
       </div>
     </>
   );

@@ -10,6 +10,7 @@ import {
   buildGraph,
   centerOn,
   fitBounds,
+  shortestPath,
 } from '@brain/graph-engine';
 import { type D3DragEvent, drag } from 'd3-drag';
 import { select } from 'd3-selection';
@@ -20,7 +21,7 @@ import { EXPLORE } from './config';
 import { ARROWS, pickInDirection } from './direction';
 import { readFonts, readPalette } from './palette';
 import { type SearchIndex, createSearchIndex } from './search';
-import { type ExploreStore, createExploreStore } from './store';
+import { type ExploreStore, type Mode, createExploreStore } from './store';
 import { type UrlState, parseUrlState, serialiseUrlState } from './url-state';
 
 export interface ControllerOptions {
@@ -149,6 +150,10 @@ export class ExploreController {
   jump(id: string): void {
     if (!this.graph.has(id)) return;
     this.reveal(id);
+    if (this.store.getState().mode === 'route') {
+      this.pick(id);
+      return;
+    }
     this.open(id);
     // Let the pop-in start before moving the camera, as in the mockup.
     setTimeout(
@@ -181,6 +186,102 @@ export class ExploreController {
   toggleDomain(domain: string): void {
     this.store.getState().toggleDomain(domain);
     this.#invalidate();
+  }
+
+  // ---------------- route ----------------
+
+  setMode(mode: Mode): void {
+    this.store.getState().setMode(mode);
+    this.#invalidate();
+  }
+
+  /**
+   * Route mode click: the first pick is the start, the second the destination. A third pick starts over.
+   * Notifies so the user always knows what the next click does.
+   */
+  pick(id: string): void {
+    const s = this.store.getState();
+    const { from, to } = s.route;
+    if (from === null || to !== null) {
+      s.setRoute({ from: id, to: null, path: null, startedAt: 0 });
+      s.select(id);
+      s.notify(`From ${this.concept(id)?.label ?? id}: now pick a destination`);
+    } else if (id !== from) {
+      s.setRoute({ to: id });
+      s.select(id);
+      this.computeRoute();
+    }
+    this.#invalidate();
+  }
+
+  /** Start a route at a concept (card "From here"). */
+  routeFrom(id: string): void {
+    this.setMode('route');
+    this.store.getState().setRoute({ from: id, to: null, path: null, startedAt: 0 });
+    this.store.getState().notify('Now pick a destination on the map');
+    this.#invalidate();
+  }
+
+  /** End a route at a concept (card "To here"): completes the route if a start exists. */
+  routeTo(id: string): void {
+    this.setMode('route');
+    const { from } = this.store.getState().route;
+    if (from !== null && from !== id) {
+      this.store.getState().setRoute({ to: id });
+      this.computeRoute();
+    } else {
+      this.store.getState().setRoute({ from: id, to: null, path: null, startedAt: 0 });
+      this.store.getState().notify('Now pick a start on the map');
+    }
+    this.#invalidate();
+  }
+
+  /** Shortest chain from start to destination: revealed hop by hop, drawn with the pulse, framed in view. */
+  computeRoute(): void {
+    const s = this.store.getState();
+    const { from, to } = s.route;
+    if (from === null || to === null) return;
+    const path = shortestPath(this.graph, from, to);
+    if (path) {
+      this.layout.revealChain(path);
+      this.#sync();
+    }
+    s.setHop(-1);
+    this.#renderer?.resetHop();
+    s.setRoute({ path, startedAt: this.#now() });
+    if (path) this.fit(path);
+  }
+
+  /** Escape: drop the route if there is one, and the selection. */
+  escape(): void {
+    if (this.store.getState().route.from !== null) this.clearRoute();
+    this.select(null);
+  }
+
+  replayRoute(): void {
+    this.store.getState().setHop(-1);
+    this.#renderer?.resetHop();
+    this.store.getState().setRoute({ startedAt: this.#now() });
+    this.#invalidate();
+  }
+
+  reverseRoute(): void {
+    const { from, to } = this.store.getState().route;
+    if (from === null || to === null) return;
+    this.store.getState().setRoute({ from: to, to: from });
+    this.computeRoute();
+  }
+
+  clearRoute(): void {
+    this.store.getState().clearRoute();
+    this.#invalidate();
+  }
+
+  /** The relation along a route hop, read in travel direction ("←" when the edge points back). */
+  hopRelation(a: string, b: string): string {
+    const rel = this.graph.relationBetween(a, b);
+    if (!rel) return '';
+    return rel.direction === 'out' ? rel.relation : `← ${rel.relation}`;
   }
 
   // ---------------- camera ----------------
@@ -256,14 +357,15 @@ export class ExploreController {
     switch (key) {
       case 'Enter':
       case ' ':
-        if (s.selectedId) this.open(s.selectedId);
+        if (s.selectedId && s.mode === 'route') this.pick(s.selectedId);
+        else if (s.selectedId) this.open(s.selectedId);
         else {
           const id = this.#nearestToCentre();
           if (id) this.select(id);
         }
         return true;
       case 'Escape':
-        this.select(null);
+        this.escape();
         return true;
       case '+':
       case '=':
@@ -300,6 +402,12 @@ export class ExploreController {
   /** Restore a shared link: layers first, then the selected concept. Unknown values were dropped by the parser. */
   applyUrlState(state: UrlState): void {
     if (state.layers) this.store.getState().setDomains(state.layers);
+    if (state.from && state.to && state.from !== state.to) {
+      this.setMode('route');
+      this.store.getState().setRoute({ from: state.from, to: state.to });
+      this.computeRoute();
+      return;
+    }
     if (state.n) {
       this.reveal(state.n);
       this.open(state.n);
@@ -310,7 +418,10 @@ export class ExploreController {
   urlState(): UrlState {
     const s = this.store.getState();
     const state: UrlState = {};
-    if (s.selectedId) state.n = s.selectedId;
+    if (s.mode === 'route' && s.route.from && s.route.to) {
+      state.from = s.route.from;
+      state.to = s.route.to;
+    } else if (s.selectedId) state.n = s.selectedId;
     if (s.activeDomains.size < this.domains.length) state.layers = [...s.activeDomains];
     return state;
   }
@@ -446,8 +557,9 @@ export class ExploreController {
     renderer.start();
     const firstFit = setTimeout(
       () => {
-        const { selectedId } = this.store.getState();
-        if (selectedId) this.center(selectedId);
+        const { selectedId, route } = this.store.getState();
+        if (route.path) this.fit(route.path);
+        else if (selectedId) this.center(selectedId);
         else this.fit();
       },
       this.#reduced ? 0 : EXPLORE.initialFitMs,
@@ -456,7 +568,14 @@ export class ExploreController {
     // Keep the address bar in step without adding history entries.
     let urlTimer: ReturnType<typeof setTimeout> | undefined;
     const unsubscribeUrl = this.store.subscribe((state, previous) => {
-      if (state.selectedId === previous.selectedId && state.activeDomains === previous.activeDomains) return;
+      if (
+        state.selectedId === previous.selectedId &&
+        state.activeDomains === previous.activeDomains &&
+        state.route === previous.route &&
+        state.mode === previous.mode
+      ) {
+        return;
+      }
       clearTimeout(urlTimer);
       urlTimer = setTimeout(() => {
         const next = `${window.location.pathname}${this.serialiseUrl()}${window.location.hash}`;
@@ -518,7 +637,8 @@ export class ExploreController {
       if (this.store.getState().mode === 'explore') this.select(null);
       return;
     }
-    this.open(id);
+    if (this.store.getState().mode === 'route') this.pick(id);
+    else this.open(id);
   }
 
   // ---------------- internals ----------------
