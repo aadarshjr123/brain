@@ -35,19 +35,20 @@ export interface ExploreState {
   toast: Toast | null;
 }
 
+/** Arrow-function properties, not methods: safe to pass around without binding. */
 export interface ExploreActions {
-  select(id: string | null): void;
-  hover(id: string | null): void;
-  setVisible(ids: ReadonlySet<string>): void;
-  toggleDomain(domain: string): void;
-  setDomains(domains: Iterable<string>): void;
-  setMode(mode: Mode): void;
-  setRoute(route: Partial<RouteState>): void;
-  clearRoute(): void;
-  setHop(hop: number): void;
-  notify(message: string): void;
-  dismissToast(): void;
-  clearTrail(): void;
+  select: (id: string | null) => void;
+  hover: (id: string | null) => void;
+  setVisible: (ids: ReadonlySet<string>) => void;
+  toggleDomain: (domain: string) => void;
+  setDomains: (domains: Iterable<string>) => void;
+  setMode: (mode: Mode) => void;
+  setRoute: (route: Partial<RouteState>) => void;
+  clearRoute: () => void;
+  setHop: (hop: number) => void;
+  notify: (message: string) => void;
+  dismissToast: () => void;
+  clearTrail: () => void;
 }
 
 export type ExploreStore = ReturnType<typeof createExploreStore>;

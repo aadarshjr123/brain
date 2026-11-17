@@ -4,7 +4,7 @@ import { seededRandom } from './geometry.ts';
 import { buildGraph } from './graph.ts';
 import { Layout } from './layout.ts';
 import { MOTION } from './motion.ts';
-import { type Palette, Renderer, type Scene, type Scheduler } from './renderer.ts';
+import { type Palette, Renderer, type Scene, type Scheduler, hubThreshold } from './renderer.ts';
 import { recordingCanvas } from './test/recording-canvas.ts';
 
 const nodes = [
@@ -72,6 +72,13 @@ beforeEach(() => {
   scene = { ...idle };
   now = 1000;
   hidden = false;
+});
+
+describe('hubThreshold', () => {
+  it('is the 85th percentile of degree', () => {
+    expect(hubThreshold([1, 1, 2, 2, 3, 3, 4, 5, 8, 10])).toBe(8);
+    expect(hubThreshold([])).toBe(Infinity);
+  });
 });
 
 describe('Renderer', () => {
@@ -195,6 +202,16 @@ describe('Renderer', () => {
     renderer.invalidate(); // the app calls this on visibilitychange
     pending.shift()?.(now);
     expect(renderer.framesDrawn).toBe(1);
+  });
+
+  it('labels hubs at mid zoom and hides the rest', () => {
+    const { rec, renderer } = setup();
+    renderer.setTransform({ x: 400, y: 300, k: 0.7 });
+    rec.reset();
+    renderer.draw(now + 10_000);
+    // b and c have degree 2 (the hubs of this chain), a has 1
+    expect(rec.texts()).toEqual(expect.arrayContaining(['Beta', 'Gamma']));
+    expect(rec.texts()).not.toContain('Alpha');
   });
 
   it('converts screen points to world points and hits nodes with a zoom-independent radius', () => {

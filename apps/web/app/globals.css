@@ -213,3 +213,21 @@
     @apply outline-2 outline-offset-2 outline-ring;
   }
 }
+
+/* Floating panels over the map (mockup v3 "glass"). */
+@utility glass {
+  background: var(--brand-surface);
+  backdrop-filter: blur(14px) saturate(1.3);
+  -webkit-backdrop-filter: blur(14px) saturate(1.3);
+  border: 1px solid var(--brand-line);
+  border-radius: var(--radius);
+  box-shadow: 0 10px 30px rgb(0 0 0 / 0.35);
+}
+@media (prefers-color-scheme: light) {
+  :root:not([data-theme='dark']) .glass {
+    box-shadow: 0 10px 30px rgb(20 30 50 / 0.12);
+  }
+}
+:root[data-theme='light'] .glass {
+  box-shadow: 0 10px 30px rgb(20 30 50 / 0.12);
+}

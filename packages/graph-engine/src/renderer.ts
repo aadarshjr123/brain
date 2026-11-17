@@ -67,6 +67,18 @@ export interface RendererOptions<N extends ConceptLike> {
   scheduler?: Scheduler;
   /** Called when the route pulse reaches a new hop (not per frame), so a card can follow the map. */
   onHop?: (hop: number) => void;
+  /** Hub cut-off for mid-zoom labels. Defaults to the 85th percentile of degree in the graph. */
+  hubDegree?: number;
+}
+
+/**
+ * Mockup v3 labelled nodes with degree > 10 at mid zoom, but no concept has more than 10 neighbours, so
+ * nothing was labelled. A percentile keeps "hub" meaningful as content grows.
+ */
+export function hubThreshold(degrees: readonly number[], percentile = 0.85): number {
+  if (degrees.length === 0) return Infinity;
+  const sorted = [...degrees].sort((a, b) => a - b);
+  return sorted[Math.min(sorted.length - 1, Math.floor(percentile * sorted.length))] ?? Infinity;
 }
 
 const browserScheduler: Scheduler = {
@@ -104,6 +116,8 @@ export class Renderer<N extends ConceptLike> {
   #handle: number | null = null;
   #running = false;
   #lastHop = -1;
+  /** Degree from which a node counts as a hub and keeps its label at mid zoom. */
+  readonly #hubDegree: number;
   /** Frames actually drawn; tests and the perf overlay read it. */
   framesDrawn = 0;
 
@@ -120,6 +134,9 @@ export class Renderer<N extends ConceptLike> {
     this.#reduced = options.reducedMotion ?? false;
     this.#scheduler = options.scheduler ?? browserScheduler;
     this.#onHop = options.onHop;
+    this.#hubDegree =
+      options.hubDegree ??
+      hubThreshold([...options.graph.nodes.keys()].map((id) => options.graph.degree(id)));
   }
 
   // ---------- configuration ----------
@@ -508,7 +525,7 @@ export class Renderer<N extends ConceptLike> {
       s.isHover ||
       s.inPath ||
       s.isNb ||
-      (s.focused ? false : k > 0.9 || (k > 0.55 && n.degree > 10));
+      (s.focused ? false : k > 0.9 || (k > 0.55 && n.degree >= this.#hubDegree));
     if (showLabel && scale > 0.6) {
       const label = this.#graph.nodes.get(n.id)?.label ?? n.id;
       const fs = 12 / Math.max(k, 0.9);
