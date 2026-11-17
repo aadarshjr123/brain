@@ -1,6 +1,6 @@
 # System design — Brain
 
-Status: v1, 2026-11-16. Companion to the PRD. Decisions referenced as ADR-xxxx live in `adr/`.
+Status: v1.1, 2026-11-17 (updated to what shipped). Companion to the PRD. Decisions referenced as ADR-xxxx live in `adr/`.
 
 ## 1. Requirements
 
@@ -19,7 +19,7 @@ Non-functional:
 ```mermaid
 flowchart LR
   subgraph repo[Repository]
-    C[content/*.yaml, *.mdx] --> V[Velite build + validator]
+    C[content/*.yaml] --> V[Zod compiler + validator, ADR-0009]
     V --> J[graph.json + notes]
   end
   subgraph build[Next.js build on Vercel]
@@ -45,7 +45,7 @@ There is no application server. Everything is built at deploy time and served fr
 ### 3.1 Content pipeline
 
 - Source: `packages/content/{domains.yaml, nodes/*.yaml, edges.yaml, notes/*.mdx}`.
-- Velite parses with Zod schemas and emits typed JSON. A custom validator runs after: unique ids, every edge endpoint exists, no self-loops, graph connected, every node has `summary` and ≥ 1 `source`, relation text ≤ 40 chars.
+- A small compiler (ADR-0009) parses YAML with Zod schemas and emits typed JSON. The validator runs after: unique ids, every edge endpoint exists, no self-loops, one relation per pair, graph connected, every node has `summary` and ≥ 1 `source`, relation text ≤ 40 chars. Source URLs are checked weekly by a separate workflow.
 - Output is imported statically by pages and shipped as one JSON chunk (~60 KB gzipped at 500 nodes).
 
 ### 3.2 Graph engine (`packages/graph-engine`, framework-free)
@@ -75,7 +75,7 @@ There is no application server. Everything is built at deploy time and served fr
 
 ### 3.6 Static pages
 
-- `/concept/[slug]`: summary, MDX note, "drives" and "driven by" lists, top routes to hub concepts, sources, "open in map" link. `generateStaticParams` from content.
+- `/concept/[id]`: summary, "drives" and "driven by" lists, shortest routes to hub concepts as text, sources, "open in map" link. `generateStaticParams` from content. (Long-form MDX notes were cut from v1, ADR-0009.)
 - `/cheatsheet`: all concepts grouped by domain, filterable, printable. The accessible, text-first twin of the map.
 - OG image per concept via `opengraph-image.tsx`.
 
@@ -123,8 +123,9 @@ Progress { conceptId → { seen: number; lastSeen: ts; mastery: 0..5 } }   // de
 
 ## 8. Security and privacy
 
-Static site, no user data leaves the device. CSP with `script-src 'self'` plus Vercel analytics, no inline scripts
-(Next.js nonce). No third-party cookies. Sentry scrubs URLs of nothing sensitive because there is nothing sensitive.
+Static site, no user data leaves the device. CSP without external script origins or eval, with Trusted Types; inline
+scripts are allowed because static App Router pages need them (ADR-0011). No third-party cookies. Sentry receives
+errors only, with no personal data.
 
 ## 9. Observability
 

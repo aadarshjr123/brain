@@ -1,5 +1,9 @@
 # Brain — professional project plan
 
+> **Status, 2026-11-17:** v1 is built (M0 to M4). This is the original plan, kept as written. Where the build
+> changed it, an ADR records why and wins: ADR-0009 (YAML compiler instead of Velite, no MDX notes in v1),
+> ADR-0010 (hand-written service worker instead of Serwist), ADR-0011 (CSP for static pages).
+
 Brain is a public, free, no-login study map and reference that connects what frontend developers do with what the browser does.
 The agreed design is the v3 mockup in `mockup/brain-graph.html`. This plan sets up the project the way a production
 web product is set up today, so it can grow from a personal relearning tool into something others use and contribute to.
