@@ -136,6 +136,13 @@ export class Layout {
       .filter((n) => !this.#nodes.has(n));
   }
 
+  /** Same as hiddenNeighbours(id).length without allocating: called per node per frame. */
+  hiddenCount(id: string): number {
+    let count = 0;
+    for (const n of this.#graph.neighbours(id)) if (!this.#nodes.has(n.id)) count++;
+    return count;
+  }
+
   /** True while the simulation still moves nodes. */
   get active(): boolean {
     return this.#sim.alpha() > this.#sim.alphaMin();
