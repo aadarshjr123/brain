@@ -1,6 +1,4 @@
-import { z } from 'zod';
-
-/** What the map can restore from a link. Route params (from, to) join in BRAIN-24. */
+/** What the map can restore from a link. */
 export interface UrlState {
   /** Selected concept. */
   n?: string;
@@ -10,18 +8,13 @@ export interface UrlState {
   to?: string;
 }
 
-const id = z.string().regex(/^[a-z][a-z0-9_]*$/);
-const list = z
-  .string()
-  .transform((s) => s.split(',').filter(Boolean))
-  .pipe(z.array(id));
-
-const Schema = z.object({
-  n: id.optional().catch(undefined),
-  layers: list.optional().catch(undefined),
-  from: id.optional().catch(undefined),
-  to: id.optional().catch(undefined),
-});
+const ID = /^[a-z][a-z0-9_]*$/;
+const id = (v: string | null): string | undefined => (v !== null && ID.test(v) ? v : undefined);
+const list = (v: string | null): string[] | undefined => {
+  if (v === null) return undefined;
+  const items = v.split(',').filter(Boolean);
+  return items.length > 0 && items.every((x) => ID.test(x)) ? items : undefined;
+};
 
 /**
  * Lenient by design: a link from an older version, a typo or a removed concept must still open the map.
@@ -31,14 +24,14 @@ export function parseUrlState(
   search: string,
   known: { concept: (id: string) => boolean; domain: (id: string) => boolean },
 ): UrlState {
+  // Hand-written instead of Zod: this runs on the map's first load, and Zod would add ~20 KB there (BRAIN-30).
   const params = new URLSearchParams(search);
-  const raw = Object.fromEntries(
-    ['n', 'layers', 'from', 'to'].flatMap((k) => {
-      const v = params.get(k);
-      return v === null ? [] : [[k, v]];
-    }),
-  );
-  const parsed = Schema.parse(raw);
+  const parsed = {
+    n: id(params.get('n')),
+    layers: list(params.get('layers')),
+    from: id(params.get('from')),
+    to: id(params.get('to')),
+  };
   const out: UrlState = {};
   if (parsed.n && known.concept(parsed.n)) out.n = parsed.n;
   if (parsed.from && known.concept(parsed.from)) out.from = parsed.from;

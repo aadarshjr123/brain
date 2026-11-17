@@ -3,29 +3,42 @@
 import { createContext, use, useEffect, useState } from 'react';
 import { Provider, useDispatch, useSelector } from 'react-redux';
 
-import { BrainDb } from './db';
-import { type AppDispatch, type ProgressStore, type RootState, hydrate, makeProgressStore } from './store';
+import type { BrainDb } from './db';
+import {
+  type AppDispatch,
+  type DbSource,
+  type ProgressStore,
+  type RootState,
+  hydrate,
+  makeProgressStore,
+} from './store';
 
 interface ProgressContext {
   store: ProgressStore;
-  db: BrainDb | null;
+  getDb: DbSource;
 }
 
 const Context = createContext<ProgressContext | null>(null);
 
-function openDb(): BrainDb | null {
-  // No IndexedDB at all (very old browsers, some embedded webviews): run in memory.
-  return typeof indexedDB === 'undefined' ? null : new BrainDb();
+/** Opens the database once, on first use, from a separate chunk. */
+function lazyDb(): DbSource {
+  let opening: Promise<BrainDb | null> | undefined;
+  return () =>
+    (opening ??=
+      // No IndexedDB at all (server render, very old browsers, some webviews): run in memory.
+      typeof indexedDB === 'undefined'
+        ? Promise.resolve(null)
+        : import('./db').then(({ BrainDb }) => new BrainDb()));
 }
 
 /** Redux for domain state, loaded from IndexedDB once per visit. Wraps every page. */
 export function ProgressProvider({ children }: { children: React.ReactNode }) {
   const [value] = useState<ProgressContext>(() => {
-    const db = typeof window === 'undefined' ? null : openDb();
-    return { db, store: makeProgressStore(db) };
+    const getDb = lazyDb();
+    return { getDb, store: makeProgressStore(getDb) };
   });
   useEffect(() => {
-    void hydrate(value.store, value.db);
+    void hydrate(value.store, value.getDb);
   }, [value]);
   return (
     <Context value={value}>
