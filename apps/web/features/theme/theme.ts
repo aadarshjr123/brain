@@ -4,10 +4,15 @@ import type { ThemeSetting } from '@/features/progress/model';
 export const THEME_KEY = 'brain-theme';
 
 /**
- * Runs in <head> before first paint. Kept tiny and static: its SHA-256 is allowed by the CSP (BRAIN-31).
- * Any change to this string changes the hash; the CSP test will fail until the header is updated.
+ * Runs in <head> before anything else:
+ * 1. applies the saved theme before first paint (no flash);
+ * 2. installs the Trusted Types default policy (ADR-0011): the only script URLs the page may load are our own
+ *    hashed chunks and the service worker. Any other string reaching a script sink throws.
  */
-export const themeScript = `try{var t=localStorage.getItem('${THEME_KEY}');if(t==='dark'||t==='light')document.documentElement.dataset.theme=t}catch(e){}`;
+export const themeScript = [
+  `try{var t=localStorage.getItem('${THEME_KEY}');if(t==='dark'||t==='light')document.documentElement.dataset.theme=t}catch(e){}`,
+  `if(window.trustedTypes&&trustedTypes.createPolicy){trustedTypes.createPolicy('default',{createScriptURL:function(u){var x=new URL(u,location.href);if(x.origin===location.origin&&(x.pathname.indexOf('/_next/static/')===0||x.pathname==='/sw.js'))return u;throw new TypeError('Blocked script URL: '+u)}})}`,
+].join(';');
 
 export function applyTheme(theme: ThemeSetting): void {
   const root = document.documentElement;

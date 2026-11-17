@@ -1,6 +1,8 @@
 import { withSentryConfig } from '@sentry/nextjs/config';
 import type { NextConfig } from 'next';
 
+import { securityHeaders, sentryOriginFromDsn } from './lib/security/headers';
+
 const nextConfig: NextConfig = {
   reactStrictMode: true,
   // Memoisation by the compiler instead of hand-written useMemo/useCallback (PLAN.md §2).
@@ -10,6 +12,13 @@ const nextConfig: NextConfig = {
   poweredByHeader: false,
   headers() {
     return Promise.resolve([
+      {
+        source: '/:path*',
+        headers: securityHeaders({
+          dev: process.env.NODE_ENV === 'development',
+          sentryOrigin: sentryOriginFromDsn(process.env.NEXT_PUBLIC_SENTRY_DSN),
+        }),
+      },
       {
         // The worker must never be cached by the browser's HTTP cache, or new deploys would not reach users.
         source: '/sw.js',
