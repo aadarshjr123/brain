@@ -8,12 +8,23 @@ import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
 import { ContentError, loadContent } from '../load.ts';
+import { type Severity, validateGraph } from '../validate.ts';
+
+/** Missing sources warn until the M4 content drive turns this to 'error'. */
+const MISSING_SOURCES: Severity = 'warning';
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '..', '..');
 const out = join(root, 'generated', 'graph.json');
 
 try {
   const graph = loadContent(join(root, 'data'));
+
+  const findings = validateGraph(graph, { missingSources: MISSING_SOURCES });
+  for (const f of findings.filter((x) => x.severity === 'warning'))
+    console.warn(`  ⚠ ${f.rule}: ${f.message}`);
+  const errors = findings.filter((x) => x.severity === 'error');
+  if (errors.length) throw new ContentError(errors.map((f) => `${f.rule}: ${f.message}`));
+
   mkdirSync(dirname(out), { recursive: true });
   writeFileSync(out, `${JSON.stringify(graph)}\n`);
   // A declaration beside the JSON: consumers get the real types without inferring a 150 KB literal.
