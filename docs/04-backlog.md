@@ -2,7 +2,8 @@
 
 Format: `BRAIN-n · type · priority · estimate` then acceptance criteria. Types: feat, chore, docs, bug, spike.
 Priority: P0 blocks the milestone, P1 should ship in it, P2 nice to have. Estimates in ideal engineering days (d) or hours (h).
-Every ticket here is mirrored as a GitHub Issue with the same id in the title; the issue is the live status, this file is the plan.
+Every ticket here is mirrored as a GitHub Issue with the ticket id in the title; the issue is the live status, this file is the plan.
+Ticket ids and issue numbers are independent (PRs share the issue counter): BRAIN-17 is issue #22.
 
 ## M0 — Foundation
 
@@ -30,6 +31,9 @@ AC: PRD, system design, roadmap, backlog, process, ADR-0001..0007, templates com
 **BRAIN-8 · docs · P1 · 2h — README + CONTRIBUTING + issue/PR templates** (EPIC-3)
 AC: README explains the product in one screen and links docs; CONTRIBUTING covers content PRs and the state rule (ADR-0006); templates in `.github/`.
 
+**BRAIN-17 · chore · P1 · 1h — Apply the main ruleset and remove the admin bypass** (EPIC-2) · #22
+AC: repo visibility decided; ruleset applied with `verify` and `commits` required; admin bypass removed after the M0 stack merges; a PR with a failing check cannot merge.
+
 ## M1 — Engine + content
 
 **BRAIN-9 · feat · P0 · 3h — Content schemas** (EPIC-4)
@@ -53,12 +57,15 @@ AC: class with canvas, DPR, transform, dirty flag, demand-driven rAF loop that p
 **BRAIN-15 · feat · P1 · 4h — Animation clocks** (EPIC-6)
 AC: node pop-in with stagger, edge grow, route progressive draw and pulse, as in mockup v3; all timings in one constants file.
 
+**BRAIN-18 · chore · P2 · 2h — Automated dependency updates** (EPIC-2) · #23
+AC: Dependabot or Renovate for npm and github-actions, weekly, grouped; SHA pins keep version comments; typescript-eslint, eslint-config-next and the pnpm override move together.
+
 **BRAIN-16 · spike · P2 · 4h — Worker layout feasibility** (EPIC-5)
 AC: prototype d3-force in a Web Worker posting `Float32Array` positions; note in `journal/` with frame timings at 500 and 1500 nodes; decision recorded as ADR if adopted.
 
 ## M2 — Explore (epics listed; tickets written at M1 close)
 
-EPIC-7 Explore stage (BRAIN-17..21) · EPIC-8 Panels & search (BRAIN-22..28) · EPIC-9 State & local storage (BRAIN-29..33) · EPIC-10 Theming & a11y base (BRAIN-34..36)
+EPIC-7 Explore stage · EPIC-8 Panels & search · EPIC-9 State & local storage · EPIC-10 Theming & a11y base (ticket ids assigned when written)
 
 ## M3 — Route + reference (epics listed)
 
