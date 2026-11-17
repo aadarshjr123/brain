@@ -208,13 +208,11 @@
 - [localstorage, indexeddb, should give way to]
 - [indexeddb, storage_quota, counts toward]
 - [opfs, storage_quota, counts toward]
-- [cookies, csrf, enable]
 - [cookies, ssr, give session to]
 - [localstorage, broadcast_channel, storage event is like]
 
 # web apis
 - [intersection_observer, image_perf, drives lazy loading in]
-- [resize_observer, layout, runs after]
 - [history_api, csr_router, underlies]
 - [navigation_api, csr_router, modernises]
 - [performance_api, core_web_vitals, measures]
