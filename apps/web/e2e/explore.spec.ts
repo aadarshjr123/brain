@@ -1,6 +1,6 @@
 import { expect, test } from '@playwright/test';
 
-import { clickConcept, mapReady, search, state } from './helpers';
+import { TOTAL, clickConcept, mapReady, search, state } from './helpers';
 
 test.describe('explore', () => {
   test.beforeEach(async ({ page }) => {
@@ -10,7 +10,7 @@ test.describe('explore', () => {
 
   test('starts with the eight seed concepts', async ({ page }) => {
     expect((await state(page)).visible).toBe(8);
-    await expect(page.getByText('8 / 144 shown')).toBeVisible();
+    await expect(page.getByText(`8 / ${String(TOTAL)} shown`)).toBeVisible();
   });
 
   test('clicking a concept unfolds it and opens its card', async ({ page }) => {
@@ -71,7 +71,9 @@ test.describe('explore', () => {
       .toBe(1);
     await page.reload();
     await mapReady(page);
-    await expect(page.getByRole('button', { name: /Your progress: [1-9]\d*\/144/ })).toBeVisible();
+    await expect(
+      page.getByRole('button', { name: new RegExp(`Your progress: [1-9]\\d*/${String(TOTAL)}`) }),
+    ).toBeVisible();
     await page.getByRole('button', { name: /Your progress/ }).click();
     await expect(page.locator('[popover] li')).toHaveText(['DOM']);
   });

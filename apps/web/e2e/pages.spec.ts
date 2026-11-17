@@ -1,5 +1,7 @@
 import { expect, test } from '@playwright/test';
 
+import { TOTAL } from './helpers';
+
 test.describe('text pages', () => {
   test('home explains the product and links into the map', async ({ page }) => {
     await page.goto('/');
@@ -13,6 +15,10 @@ test.describe('text pages', () => {
     await expect(page.getByRole('heading', { level: 1, name: 'CORS' })).toBeVisible();
     await expect(page.getByRole('heading', { name: /Driven by/ })).toBeVisible();
     await expect(page.getByRole('heading', { name: 'How it reaches the big ideas' })).toBeVisible();
+    await expect(page.getByRole('link', { name: /Cross-Origin Resource Sharing/ })).toHaveAttribute(
+      'href',
+      /^https:\/\//,
+    );
     await page.getByRole('link', { name: 'Open in the map' }).click();
     await expect(page).toHaveURL(/\/explore\?n=cors/);
   });
@@ -32,9 +38,9 @@ test.describe('text pages', () => {
 
   test('the cheatsheet filters as you type', async ({ page }) => {
     await page.goto('/cheatsheet');
-    await expect(page.getByRole('status')).toHaveText('144 shown');
+    await expect(page.getByRole('status')).toHaveText(`${String(TOTAL)} shown`);
     await page.getByRole('searchbox', { name: 'Filter concepts' }).fill('paint');
-    await expect(page.getByRole('status')).not.toHaveText('144 shown');
+    await expect(page.getByRole('status')).not.toHaveText(`${String(TOTAL)} shown`);
   });
 
   test('unknown concepts are a 404', async ({ page }) => {
