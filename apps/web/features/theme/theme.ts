@@ -4,14 +4,22 @@ import type { ThemeSetting } from '@/features/progress/model';
 export const THEME_KEY = 'brain-theme';
 
 /**
+ * Same-origin script paths the page may load: our hashed chunks, the service worker, and Vercel Speed Insights /
+ * Web Analytics. Vercel serves those from a random 16-hex-character first-party path in production, with
+ * `/_vercel/...` as the documented fallback.
+ */
+export const SCRIPT_URL_ALLOW =
+  /^\/(?:_next\/static\/|sw\.js$|_vercel\/(?:insights|speed-insights)\/script\.js$|[0-9a-f]{16}\/script\.js$)/;
+
+/**
  * Runs in <head> before anything else:
  * 1. applies the saved theme before first paint (no flash);
- * 2. installs the Trusted Types default policy (ADR-0011): the only script URLs the page may load are our own
- *    hashed chunks and the service worker. Any other string reaching a script sink throws.
+ * 2. installs the Trusted Types default policy (ADR-0011): the only script URLs the page may load are same-origin
+ *    paths matching SCRIPT_URL_ALLOW. Any other string reaching a script sink throws.
  */
 export const themeScript = [
   `try{var t=localStorage.getItem('${THEME_KEY}');if(t==='dark'||t==='light')document.documentElement.dataset.theme=t}catch(e){}`,
-  `if(window.trustedTypes&&trustedTypes.createPolicy){trustedTypes.createPolicy('default',{createScriptURL:function(u){var x=new URL(u,location.href);if(x.origin===location.origin&&(x.pathname.indexOf('/_next/static/')===0||x.pathname==='/sw.js'))return u;throw new TypeError('Blocked script URL: '+u)}})}`,
+  `if(window.trustedTypes&&trustedTypes.createPolicy){trustedTypes.createPolicy('default',{createScriptURL:function(u){var x=new URL(u,location.href);if(x.origin===location.origin&&${SCRIPT_URL_ALLOW.toString()}.test(x.pathname))return u;throw new TypeError('Blocked script URL: '+u)}})}`,
 ].join(';');
 
 export function applyTheme(theme: ThemeSetting): void {
