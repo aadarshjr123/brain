@@ -3,6 +3,8 @@
 import type { Neighbour } from '@brain/graph-engine';
 import { Shrink, Sparkles, X } from 'lucide-react';
 
+import { BookmarkButton } from '@/features/progress/bookmark-button';
+
 import { useController, useExplore } from '../context';
 import { domainStyle } from './domain-style';
 
@@ -77,6 +79,7 @@ export function DetailCard() {
               Fold
             </button>
           )}
+          <BookmarkButton id={node.id} label={node.label} />
         </div>
         <Relations title={`${node.label} drives`} items={drives} fromId={node.id} />
         <Relations title={`Driven by`} items={drivenBy} fromId={node.id} />

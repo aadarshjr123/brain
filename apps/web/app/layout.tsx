@@ -3,6 +3,7 @@ import { SpeedInsights } from '@vercel/speed-insights/next';
 import type { Metadata, Viewport } from 'next';
 import { Bricolage_Grotesque, IBM_Plex_Mono, IBM_Plex_Sans } from 'next/font/google';
 
+import { ProgressProvider } from '@/features/progress/provider';
 import { siteUrl } from '@/lib/site';
 import { cn } from '@/lib/utils';
 
@@ -48,7 +49,7 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
   return (
     <html lang="en" className={cn(display.variable, sans.variable, mono.variable)}>
       <body className="min-h-dvh">
-        {children}
+        <ProgressProvider>{children}</ProgressProvider>
         {/* Vercel serves these scripts from its edge, so they only exist in Vercel builds. No cookies, no personal identifiers. */}
         {process.env.VERCEL === '1' && (
           <>

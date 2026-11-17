@@ -11,6 +11,8 @@ import { Toast } from '@/features/explore/components/toast';
 import { Tools } from '@/features/explore/components/tools';
 import { Trail } from '@/features/explore/components/trail';
 import { ExploreProvider, useController } from '@/features/explore/context';
+import { ProgressBridge } from '@/features/progress/progress-bridge';
+import { ProgressPanel } from '@/features/progress/progress-panel';
 
 export function ExploreView() {
   return (
@@ -19,6 +21,7 @@ export function ExploreView() {
         <h1 className="sr-only">Brain concept map</h1>
         <Stage />
         <Overlay />
+        <ProgressBridge />
       </main>
     </ExploreProvider>
   );
@@ -47,6 +50,7 @@ function Overlay() {
           <SearchBox />
         </div>
         <div className="col-start-2 row-start-1 flex items-center gap-2 justify-self-end sm:col-start-3">
+          <ProgressPanel />
           <Tools />
         </div>
       </div>
