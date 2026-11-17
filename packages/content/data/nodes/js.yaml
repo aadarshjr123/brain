@@ -3,128 +3,212 @@
   label: V8 (JS engine)
   summary: >-
     Parses, compiles and runs JS. Lives inside the renderer on the main thread (or a worker).
-  verified: 2026-11-16
+  sources:
+    - title: 'V8 documentation'
+      url: https://v8.dev/docs
+  verified: 2026-11-17
 - id: js_parser
   label: Parser / pre-parser
   summary: >-
     Lazy parsing: functions are pre-parsed and fully parsed only when called. Big bundles pay here.
-  verified: 2026-11-16
+  sources:
+    - title: 'V8: Blazingly fast parsing, part 2: lazy parsing'
+      url: https://v8.dev/blog/preparser
+  verified: 2026-11-17
 - id: ignition
   label: Ignition (interpreter)
   summary: >-
     Compiles to bytecode fast and starts running immediately.
-  verified: 2026-11-16
+  sources:
+    - title: 'V8: Firing up the Ignition interpreter'
+      url: https://v8.dev/blog/ignition-interpreter
+  verified: 2026-11-17
 - id: turbofan
   label: TurboFan (JIT)
   summary: >-
     Hot functions get optimised to machine code based on observed types. Changing types later
     deoptimises.
-  verified: 2026-11-16
+  sources:
+    - title: 'V8: TurboFan'
+      url: https://v8.dev/docs/turbofan
+  verified: 2026-11-17
 - id: hidden_classes
   label: Hidden classes & inline caches
   summary: >-
     V8 tracks object shapes. Same shape, same property order, fast property access. Adding properties
     dynamically breaks it.
-  verified: 2026-11-16
+  sources:
+    - title: 'V8: Fast properties in V8'
+      url: https://v8.dev/blog/fast-properties
+  verified: 2026-11-17
 - id: call_stack
   label: Call stack
   summary: >-
     Frames of currently executing functions. Synchronous. Must be empty before the event loop can run
     the next task.
-  verified: 2026-11-16
+  sources:
+    - title: 'MDN: Call stack'
+      url: https://developer.mozilla.org/en-US/docs/Glossary/Call_stack
+  verified: 2026-11-17
 - id: heap
   label: Heap
   summary: >-
     Where objects live. Young generation (short-lived) and old generation.
-  verified: 2026-11-16
+  sources:
+    - title: 'MDN: Memory management'
+      url: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Guide/Memory_management
+  verified: 2026-11-17
 - id: gc
   label: Garbage collection
   summary: >-
     Mark and sweep. Minor GCs are cheap, major GCs pause the main thread. Allocation rate per frame
     matters.
-  verified: 2026-11-16
+  sources:
+    - title: 'V8: Trash talk: the Orinoco garbage collector'
+      url: https://v8.dev/blog/trash-talk
+  verified: 2026-11-17
 - id: memory_leak
   label: Memory leaks
   summary: >-
     Detached DOM nodes held by closures, forgotten listeners and timers, growing caches.
-  verified: 2026-11-16
+  sources:
+    - title: 'Fix memory problems (Chrome DevTools)'
+      url: https://developer.chrome.com/docs/devtools/memory-problems
+  verified: 2026-11-17
 - id: execution_context
   label: Execution context
   summary: >-
     Created per function call: variable environment, scope chain, this binding.
-  verified: 2026-11-16
+  sources:
+    - title: 'ECMAScript: execution contexts'
+      url: https://tc39.es/ecma262/#sec-execution-contexts
+  verified: 2026-11-17
 - id: scope
   label: Scope & closures
   summary: >-
     Functions capture the environment they were created in. Closures are why callbacks remember state
     and why leaks happen.
-  verified: 2026-11-16
+  sources:
+    - title: 'MDN: Closures'
+      url: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Guide/Closures
+  verified: 2026-11-17
 - id: this
   label: this binding
   summary: >-
     Set by how a function is called, not where it is defined. Arrow functions inherit it lexically.
-  verified: 2026-11-16
+  sources:
+    - title: 'MDN: this'
+      url: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Operators/this
+  verified: 2026-11-17
 - id: prototype
   label: Prototype chain
   summary: >-
     Property lookup walks the chain. Classes are sugar over it.
-  verified: 2026-11-16
+  sources:
+    - title: 'MDN: Inheritance and the prototype chain'
+      url: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Guide/Inheritance_and_the_prototype_chain
+  verified: 2026-11-17
 - id: hoisting
   label: Hoisting & TDZ
   summary: >-
     Declarations are processed before execution. let and const exist but are inaccessible until their
     line (temporal dead zone).
-  verified: 2026-11-16
+  sources:
+    - title: 'MDN: Hoisting'
+      url: https://developer.mozilla.org/en-US/docs/Glossary/Hoisting
+  verified: 2026-11-17
 - id: promises
   label: Promises
   summary: >-
     A value that will exist later. Every .then reaction is queued as a microtask.
-  verified: 2026-11-16
+  sources:
+    - title: 'MDN: Using promises'
+      url: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Guide/Using_promises
+  verified: 2026-11-17
 - id: async_await
   label: async / await
   summary: >-
     Syntax over promises. await suspends the function and resumes it as a microtask when the promise
     settles.
-  verified: 2026-11-16
+  sources:
+    - title: 'MDN: async function'
+      url: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Statements/async_function
+  verified: 2026-11-17
 - id: generators
   label: Generators
   summary: >-
     Functions that can pause and resume. The mechanism async/await is built on.
-  verified: 2026-11-16
+  sources:
+    - title: 'MDN: Iterators and generators'
+      url: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Guide/Iterators_and_generators
+  verified: 2026-11-17
 - id: esm
   label: ES modules
   summary: >-
     Static imports, resolved and linked before execution. Deferred by default in the browser. Enables
     tree shaking.
-  verified: 2026-11-16
+  sources:
+    - title: 'MDN: JavaScript modules'
+      url: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Guide/Modules
+  verified: 2026-11-17
 - id: dynamic_import
   label: Dynamic import()
   summary: >-
     Returns a promise for a module. The primitive behind code splitting.
-  verified: 2026-11-16
+  sources:
+    - title: 'MDN: import()'
+      url: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Operators/import
+  verified: 2026-11-17
 - id: structured_clone
   label: Structured clone
   summary: >-
     How data crosses to workers, IndexedDB and postMessage. Copies, does not share. Functions and DOM
     nodes cannot cross.
-  verified: 2026-11-16
+  sources:
+    - title: 'MDN: The structured clone algorithm'
+      url: https://developer.mozilla.org/en-US/docs/Web/API/Web_Workers_API/Structured_clone_algorithm
+  verified: 2026-11-17
 - id: typed_arrays
   label: Typed arrays & ArrayBuffer
   summary: >-
     Raw binary memory. Transferable to workers without copying.
-  verified: 2026-11-16
+  sources:
+    - title: 'MDN: JavaScript typed arrays'
+      url: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Guide/Typed_arrays
+  verified: 2026-11-17
 - id: weakref
   label: WeakMap / WeakRef
   summary: >-
     Hold references the GC is allowed to collect. Used for caches keyed by objects.
-  verified: 2026-11-16
+  sources:
+    - title: 'MDN: WeakRef'
+      url: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/WeakRef
+  verified: 2026-11-17
 - id: proxy
   label: Proxy / Reflect
   summary: >-
     Intercept property access. The engine of Vue 3 and Solid reactivity.
-  verified: 2026-11-16
+  sources:
+    - title: 'MDN: Proxy'
+      url: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Proxy
+  verified: 2026-11-17
 - id: json
   label: JSON parse / stringify
   summary: >-
     Synchronous and on the main thread. Large payloads block.
-  verified: 2026-11-16
+  sources:
+    - title: 'MDN: JSON'
+      url: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/JSON
+  verified: 2026-11-17
+
+# beyond JavaScript (added in the content drive, 2026-11-17)
+- id: wasm
+  label: WebAssembly
+  summary: >-
+    A compact binary format the engine compiles to machine code, first fast and then optimised. Runs next
+    to JS in the same thread and shares memory through an ArrayBuffer.
+  aliases: [wasm]
+  sources:
+    - title: 'MDN: WebAssembly concepts'
+      url: https://developer.mozilla.org/en-US/docs/WebAssembly/Guides/Concepts
+  verified: 2026-11-17

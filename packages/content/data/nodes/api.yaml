@@ -3,64 +3,115 @@
   label: IntersectionObserver
   summary: >-
     Async visibility notifications. Replaces scroll listeners for lazy loading and infinite scroll.
-  verified: 2026-11-16
+  sources:
+    - title: 'MDN: Intersection Observer API'
+      url: https://developer.mozilla.org/en-US/docs/Web/API/Intersection_Observer_API
+  verified: 2026-11-17
 - id: resize_observer
   label: ResizeObserver
   summary: >-
     Fires after layout, before paint, when an element’s size changes. Container queries in JS.
-  verified: 2026-11-16
+  sources:
+    - title: 'MDN: ResizeObserver'
+      url: https://developer.mozilla.org/en-US/docs/Web/API/ResizeObserver
+  verified: 2026-11-17
 - id: mutation_observer
   label: MutationObserver
   summary: >-
     Fires as a microtask after DOM changes.
-  verified: 2026-11-16
+  sources:
+    - title: 'MDN: MutationObserver'
+      url: https://developer.mozilla.org/en-US/docs/Web/API/MutationObserver
+  verified: 2026-11-17
 - id: history_api
   label: History API
   summary: >-
     pushState and popstate. What client-side routers are built on.
-  verified: 2026-11-16
+  sources:
+    - title: 'MDN: History API'
+      url: https://developer.mozilla.org/en-US/docs/Web/API/History_API
+  verified: 2026-11-17
 - id: navigation_api
   label: Navigation API
   summary: >-
     Newer router primitive: intercept navigations, get a single event for all of them.
-  verified: 2026-11-16
+  sources:
+    - title: 'MDN: Navigation API'
+      url: https://developer.mozilla.org/en-US/docs/Web/API/Navigation_API
+  verified: 2026-11-17
 - id: performance_api
   label: Performance API
   summary: >-
     performance.now, marks, measures and PerformanceObserver for long tasks, LCP, layout shifts.
-  verified: 2026-11-16
+  sources:
+    - title: 'MDN: Performance APIs'
+      url: https://developer.mozilla.org/en-US/docs/Web/API/Performance_API
+  verified: 2026-11-17
 - id: web_animations
   label: Web Animations API
   summary: >-
     element.animate(). Compositor-driven when animating transform or opacity.
-  verified: 2026-11-16
+  sources:
+    - title: 'MDN: Web Animations API'
+      url: https://developer.mozilla.org/en-US/docs/Web/API/Web_Animations_API
+  verified: 2026-11-17
 - id: view_transitions
   label: View Transitions API
   summary: >-
     Snapshot old state, animate to new. Cross-document version works on navigation.
-  verified: 2026-11-16
+  sources:
+    - title: 'MDN: View Transition API'
+      url: https://developer.mozilla.org/en-US/docs/Web/API/View_Transition_API
+  verified: 2026-11-17
 - id: shadow_dom
   label: Shadow DOM & custom elements
   summary: >-
     Encapsulated subtree with scoped styles. The platform’s component model.
-  verified: 2026-11-16
+  sources:
+    - title: 'MDN: Using shadow DOM'
+      url: https://developer.mozilla.org/en-US/docs/Web/API/Web_components/Using_shadow_DOM
+  verified: 2026-11-17
 - id: canvas
   label: Canvas / WebGL / WebGPU
   summary: >-
     Immediate-mode drawing. Bypasses DOM, style and layout. You own the frame.
-  verified: 2026-11-16
+  sources:
+    - title: 'MDN: Canvas API'
+      url: https://developer.mozilla.org/en-US/docs/Web/API/Canvas_API
+  verified: 2026-11-17
 - id: css_containment
   label: CSS containment & content-visibility
   summary: >-
     Tell the browser a subtree is independent so style and layout can skip it. Huge wins on long pages.
-  verified: 2026-11-16
+  sources:
+    - title: 'MDN: Using CSS containment'
+      url: https://developer.mozilla.org/en-US/docs/Web/CSS/Guides/Containment/Using
+  verified: 2026-11-17
 - id: scheduler_yield
   label: scheduler.yield / postTask
   summary: >-
     Break long tasks by yielding to the event loop with priority. Input gets in between chunks.
-  verified: 2026-11-16
+  sources:
+    - title: 'MDN: Scheduler.yield()'
+      url: https://developer.mozilla.org/en-US/docs/Web/API/Scheduler/yield
+  verified: 2026-11-17
 - id: broadcast_channel
   label: BroadcastChannel
   summary: >-
     Message other tabs of the same origin.
-  verified: 2026-11-16
+  sources:
+    - title: 'MDN: Broadcast Channel API'
+      url: https://developer.mozilla.org/en-US/docs/Web/API/Broadcast_Channel_API
+  verified: 2026-11-17
+
+# cancellation (added in the content drive, 2026-11-17)
+- id: abort_controller
+  label: AbortController
+  summary: >-
+    Creates an AbortSignal you pass to fetch, addEventListener or streams; calling abort() cancels all of
+    them at once. The standard way to clean up work when a component unmounts.
+  aliases: [AbortSignal]
+  sources:
+    - title: 'MDN: AbortController'
+      url: https://developer.mozilla.org/en-US/docs/Web/API/AbortController
+  verified: 2026-11-17

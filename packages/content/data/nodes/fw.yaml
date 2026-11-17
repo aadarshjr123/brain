@@ -4,136 +4,214 @@
   summary: >-
     A JS tree describing UI. Diffed against the previous one so only real changes hit the DOM. React,
     Vue, Preact.
-  verified: 2026-11-16
+  sources:
+    - title: 'React: Preserving and resetting state'
+      url: https://react.dev/learn/preserving-and-resetting-state
+  verified: 2026-11-17
 - id: reconciliation
   label: Reconciliation (diffing)
   summary: >-
     Compare new and old element trees. Keys let the algorithm match list items instead of reusing by
     position.
-  verified: 2026-11-16
+  sources:
+    - title: 'React: Render and commit'
+      url: https://react.dev/learn/render-and-commit
+  verified: 2026-11-17
 - id: fiber
   label: React Fiber
   summary: >-
     React’s linked-list rewrite of the stack so rendering can be paused, resumed and prioritised.
-  verified: 2026-11-16
+  sources:
+    - title: 'React Fiber architecture (Andrew Clark)'
+      url: https://github.com/acdlite/react-fiber-architecture
+  verified: 2026-11-17
 - id: react_scheduler
   label: React scheduler
   summary: >-
     Splits render work into 5ms chunks and yields via MessageChannel so the browser can handle input
     between them.
-  verified: 2026-11-16
+  sources:
+    - title: 'React source: scheduler package'
+      url: https://github.com/react/react/tree/main/packages/scheduler
+  verified: 2026-11-17
 - id: render_phase
   label: Render phase
   summary: >-
     Components run, hooks called, new tree computed. Pure and interruptible. No DOM yet.
-  verified: 2026-11-16
+  sources:
+    - title: 'React: Render and commit'
+      url: https://react.dev/learn/render-and-commit
+  verified: 2026-11-17
 - id: commit_phase
   label: Commit phase
   summary: >-
     DOM mutations applied synchronously. Then layout effects, then passive effects later.
-  verified: 2026-11-16
+  sources:
+    - title: 'React: Render and commit'
+      url: https://react.dev/learn/render-and-commit
+  verified: 2026-11-17
 - id: set_state
   label: setState / batching
   summary: >-
     State updates are queued, not applied. React batches all updates in the same tick into one render.
-  verified: 2026-11-16
+  sources:
+    - title: 'React: Queueing a series of state updates'
+      url: https://react.dev/learn/queueing-a-series-of-state-updates
+  verified: 2026-11-17
 - id: hooks
   label: Hooks
   summary: >-
     State and effects stored on the fiber in call order. Which is why they cannot be conditional.
-  verified: 2026-11-16
+  sources:
+    - title: 'React: Built-in React Hooks'
+      url: https://react.dev/reference/react/hooks
+  verified: 2026-11-17
 - id: use_effect
   label: useEffect
   summary: >-
     Runs after paint, in a separate task. Safe for subscriptions and fetches, wrong for measuring
     layout.
-  verified: 2026-11-16
+  sources:
+    - title: 'React: useEffect'
+      url: https://react.dev/reference/react/useEffect
+  verified: 2026-11-17
 - id: use_layout_effect
   label: useLayoutEffect
   summary: >-
     Runs synchronously after DOM mutation, before paint. Reads layout here cause forced layout but no
     flicker.
-  verified: 2026-11-16
+  sources:
+    - title: 'React: useLayoutEffect'
+      url: https://react.dev/reference/react/useLayoutEffect
+  verified: 2026-11-17
 - id: memo
   label: Memoization
   summary: >-
     memo, useMemo, useCallback. Skip work when inputs are unchanged. Costs memory and comparison time.
-  verified: 2026-11-16
+  sources:
+    - title: 'React: memo'
+      url: https://react.dev/reference/react/memo
+  verified: 2026-11-17
 - id: context
   label: Context
   summary: >-
     Pass values down without props. Every consumer re-renders when the value identity changes.
-  verified: 2026-11-16
+  sources:
+    - title: 'React: Passing data deeply with context'
+      url: https://react.dev/learn/passing-data-deeply-with-context
+  verified: 2026-11-17
 - id: concurrent
   label: Concurrent rendering
   summary: >-
     Transitions and deferred values let React render in the background and throw away work when input
     arrives.
-  verified: 2026-11-16
+  sources:
+    - title: 'React: useTransition'
+      url: https://react.dev/reference/react/useTransition
+  verified: 2026-11-17
 - id: suspense
   label: Suspense
   summary: >-
     A component throws a promise. React shows a fallback and retries when it resolves.
-  verified: 2026-11-16
+  sources:
+    - title: 'React: Suspense'
+      url: https://react.dev/reference/react/Suspense
+  verified: 2026-11-17
 - id: ssr
   label: Server-side rendering
   summary: >-
     HTML generated on the server. Fast first paint, then JS must hydrate before anything is interactive.
-  verified: 2026-11-16
+  sources:
+    - title: 'Rendering on the web'
+      url: https://web.dev/articles/rendering-on-the-web
+  verified: 2026-11-17
 - id: hydration
   label: Hydration
   summary: >-
     Attach event listeners and state to server-rendered DOM. Mismatch errors come from different output
     on server and client.
-  verified: 2026-11-16
+  sources:
+    - title: 'React: hydrateRoot'
+      url: https://react.dev/reference/react-dom/client/hydrateRoot
+  verified: 2026-11-17
 - id: streaming_ssr
   label: Streaming SSR
   summary: >-
     Server flushes HTML in chunks as Suspense boundaries resolve. Browser parses progressively.
-  verified: 2026-11-16
+  sources:
+    - title: 'React: renderToReadableStream'
+      url: https://react.dev/reference/react-dom/server/renderToReadableStream
+  verified: 2026-11-17
 - id: rsc
   label: Server components
   summary: >-
     Components that run only on the server and send a serialised tree, not JS, to the client.
-  verified: 2026-11-16
+  sources:
+    - title: 'React: Server Components'
+      url: https://react.dev/reference/rsc/server-components
+  verified: 2026-11-17
 - id: islands
   label: Islands architecture
   summary: >-
     Static HTML with isolated interactive islands that hydrate independently. Astro, Fresh.
-  verified: 2026-11-16
+  sources:
+    - title: 'Islands architecture (patterns.dev)'
+      url: https://www.patterns.dev/vanilla/islands-architecture
+  verified: 2026-11-17
 - id: signals
   label: Signals / fine-grained reactivity
   summary: >-
     Track which computation read which value and update only those. Solid, Vue, Svelte 5, Preact
     signals. No diffing.
-  verified: 2026-11-16
+  sources:
+    - title: 'TC39 proposal: Signals'
+      url: https://github.com/tc39/proposal-signals
+  verified: 2026-11-17
 - id: compiler
   label: Framework compilers
   summary: >-
     Svelte, Vue and React Compiler analyse components at build time to skip runtime work.
-  verified: 2026-11-16
+  sources:
+    - title: 'React Compiler'
+      url: https://react.dev/learn/react-compiler
+  verified: 2026-11-17
 - id: code_splitting
   label: Code splitting / lazy
   summary: >-
     React.lazy and route-level chunks built on dynamic import.
-  verified: 2026-11-16
+  sources:
+    - title: 'Reduce JavaScript payloads with code splitting'
+      url: https://web.dev/articles/reduce-javascript-payloads-with-code-splitting
+  verified: 2026-11-17
 - id: csr_router
   label: Client-side router
   summary: >-
     Intercepts link clicks, pushes history, renders the matching component without a navigation.
-  verified: 2026-11-16
+  sources:
+    - title: 'MDN: History API'
+      url: https://developer.mozilla.org/en-US/docs/Web/API/History_API
+  verified: 2026-11-17
 - id: state_store
   label: State management
   summary: >-
     Redux, Zustand, Pinia, Jotai. External stores sync into React via useSyncExternalStore.
-  verified: 2026-11-16
+  sources:
+    - title: 'React: Managing state'
+      url: https://react.dev/learn/managing-state
+  verified: 2026-11-17
 - id: bundler
   label: Bundler
   summary: >-
     Vite, webpack, esbuild. Resolves modules, tree-shakes, splits chunks, hashes filenames for caching.
-  verified: 2026-11-16
+  sources:
+    - title: 'webpack: Concepts'
+      url: https://webpack.js.org/concepts/
+  verified: 2026-11-17
 - id: tree_shaking
   label: Tree shaking
   summary: >-
     Dropping unused exports. Requires ES modules and side-effect-free code.
-  verified: 2026-11-16
+  sources:
+    - title: 'MDN: Tree shaking'
+      url: https://developer.mozilla.org/en-US/docs/Glossary/Tree_shaking
+  verified: 2026-11-17

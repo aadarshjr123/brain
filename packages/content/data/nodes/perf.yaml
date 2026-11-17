@@ -3,62 +3,128 @@
   label: Critical rendering path
   summary: >-
     HTML → DOM, CSS → CSSOM, render tree, layout, paint. Everything that must happen before first pixel.
-  verified: 2026-11-16
+  sources:
+    - title: 'Understand the critical path'
+      url: https://web.dev/learn/performance/understanding-the-critical-path
+  verified: 2026-11-17
 - id: ttfb
   label: TTFB
   summary: >-
     Time to first byte of the HTML. Server, DNS, TLS and redirects all add to it.
-  verified: 2026-11-16
+  sources:
+    - title: 'Time to First Byte (TTFB)'
+      url: https://web.dev/articles/ttfb
+  verified: 2026-11-17
 - id: fcp
   label: FCP
   summary: >-
     First Contentful Paint. First text or image on screen.
-  verified: 2026-11-16
+  sources:
+    - title: 'First Contentful Paint (FCP)'
+      url: https://web.dev/articles/fcp
+  verified: 2026-11-17
 - id: lcp
   label: LCP
   summary: >-
     Largest Contentful Paint. Usually the hero image or heading. Hurt by lazy-loaded heroes and
     render-blocking CSS.
-  verified: 2026-11-16
+  sources:
+    - title: 'Largest Contentful Paint (LCP)'
+      url: https://web.dev/articles/lcp
+  verified: 2026-11-17
 - id: inp
   label: INP
   summary: >-
     Interaction to Next Paint. From input to the next frame. Hurt by long tasks and heavy renders.
-  verified: 2026-11-16
+  sources:
+    - title: 'Interaction to Next Paint (INP)'
+      url: https://web.dev/articles/inp
+  verified: 2026-11-17
 - id: cls
   label: CLS
   summary: >-
     Cumulative Layout Shift. Elements moving after paint. Caused by images without dimensions, late
     fonts, injected banners.
-  verified: 2026-11-16
+  sources:
+    - title: 'Cumulative Layout Shift (CLS)'
+      url: https://web.dev/articles/cls
+  verified: 2026-11-17
 - id: tbt
   label: TBT / long tasks
   summary: >-
     Total Blocking Time. Sum of the part of each task over 50ms.
-  verified: 2026-11-16
+  sources:
+    - title: 'Total Blocking Time (TBT)'
+      url: https://web.dev/articles/tbt
+  verified: 2026-11-17
 - id: layout_thrash
   label: Layout thrashing
   summary: >-
     Alternating DOM writes and layout reads in a loop. Each read forces a fresh layout.
-  verified: 2026-11-16
+  sources:
+    - title: 'Avoid large, complex layouts and layout thrashing'
+      url: https://web.dev/articles/avoid-large-complex-layouts-and-layout-thrashing
+  verified: 2026-11-17
 - id: bundle_size
   label: Bundle size
   summary: >-
     More JS means more download, more parse, more compile, more execute. All on the main thread.
-  verified: 2026-11-16
+  sources:
+    - title: 'Reduce JavaScript payloads with code splitting'
+      url: https://web.dev/articles/reduce-javascript-payloads-with-code-splitting
+  verified: 2026-11-17
 - id: image_perf
   label: Image loading
   summary: >-
     Decode is expensive. Responsive srcset, modern formats, fetchpriority=high on the hero, lazy
     elsewhere.
-  verified: 2026-11-16
+  sources:
+    - title: 'Optimize Largest Contentful Paint'
+      url: https://web.dev/articles/optimize-lcp
+  verified: 2026-11-17
 - id: font_loading
   label: Font loading
   summary: >-
     Web fonts block text (FOIT) or swap (FOUT). font-display and preload decide which.
-  verified: 2026-11-16
+  sources:
+    - title: 'Best practices for fonts'
+      url: https://web.dev/articles/font-best-practices
+  verified: 2026-11-17
 - id: core_web_vitals
   label: Core Web Vitals
   summary: >-
     LCP, INP, CLS. The three numbers Google uses and most teams track.
-  verified: 2026-11-16
+  sources:
+    - title: 'Web Vitals'
+      url: https://web.dev/articles/vitals
+  verified: 2026-11-17
+
+# rendering hints and pacing (added in the content drive, 2026-11-17)
+- id: will_change
+  label: will-change
+  summary: >-
+    Tells the browser a property is about to animate, so it can promote the element to its own layer ahead
+    of time. Overuse costs GPU memory; add it just before animating, remove it after.
+  sources:
+    - title: 'MDN: will-change'
+      url: https://developer.mozilla.org/en-US/docs/Web/CSS/Reference/Properties/will-change
+  verified: 2026-11-17
+- id: content_visibility
+  label: content-visibility
+  summary: >-
+    content-visibility: auto lets the browser skip style, layout and paint for content that is off screen
+    until it scrolls near, which can cut initial rendering work sharply on long pages.
+  sources:
+    - title: 'content-visibility: the new CSS property that boosts rendering performance'
+      url: https://web.dev/articles/content-visibility
+  verified: 2026-11-17
+- id: debounce_throttle
+  label: Debounce & throttle
+  summary: >-
+    Rate-limit a handler: debounce waits until events stop, throttle runs at most once per interval. Keeps
+    scroll, resize and input handlers from flooding the main thread.
+  aliases: [debounce, throttle]
+  sources:
+    - title: 'MDN: Debounce'
+      url: https://developer.mozilla.org/en-US/docs/Glossary/Debounce
+  verified: 2026-11-17
