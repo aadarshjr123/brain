@@ -41,7 +41,7 @@ The trade: the canvas stage is a `'use client'` island loaded with `next/dynamic
 | Git hygiene     | **Husky** + **lint-staged**, **Conventional Commits** (commitlint), **Changesets** for package versions      |                                                                                                                                       |
 | CI/CD           | **GitHub Actions**: typecheck, lint, unit, build, e2e on PR; **Vercel** preview per PR, production on `main` | See §4c for hosting.                                                                                                                  |
 | Monitoring      | **Vercel Analytics + Speed Insights**, **Sentry**                                                            | An app about Core Web Vitals should track its own.                                                                                    |
-| PWA             | **Serwist**                                                                                                  | On topic: the app about service workers ships one.                                                                                    |
+| PWA             | **Hand-written service worker** (ADR-0010; Serwist planned, replaced)                                        | On topic: the app about service workers ships one.                                                                                    |
 | Package manager | **pnpm** workspaces + **Turborepo**                                                                          | Light monorepo from day one (see layout).                                                                                             |
 
 ---
@@ -117,7 +117,7 @@ Rule of thumb for contributors: if the Renderer needs it per frame, Zustand. If 
 
 - **Dexie** tables: `events` (append-only log of what you explored and answered), `bookmarks`, `notes` (personal markdown per concept), `settings` mirror.
 - Progress is per device. An **Export / Import** button moves it as a JSON file. That is the whole sync story for v1 and it is deliberate (ADR-0005).
-- Serwist caches the app shell and the content bundle so the map opens offline.
+- A service worker caches the app shell and the content bundle so the map opens offline (ADR-0010).
 - Content (nodes, edges, MDX notes) is **not** user data. It lives in the repo, versioned and reviewed by PR, built by Velite into a static JSON the app loads once.
 
 ### 4c. Hosting
@@ -155,7 +155,7 @@ Port nodes/edges from the mockup into `packages/content` as YAML. Velite schemas
 Stage island, Zustand engine store, Redux slices (`settings`, `session`, `progress`) with redux-persist, Dexie event log, TopBar, Command palette search, Legend, Trail, DetailCard, Toasts, URL state, keyboard, both themes. Playwright smoke: load, unfold, search, select, reload keeps progress.
 
 **Phase 3 — Route + concept pages (3 days)**
-Route mode with progressive draw and pulse, RouteCard sync, replay/reverse. `/concept/[slug]` static pages with MDX notes and OG images. Sitemap. PWA via Serwist.
+Route mode with progressive draw and pulse, RouteCard sync, replay/reverse. `/concept/[slug]` static pages with MDX notes and OG images. Sitemap. Offline shell via a service worker (ADR-0010).
 
 **Phase 4 — Reference layer (3 to 4 days)**
 Cheatsheet view: every concept as a scannable list grouped by domain, printable, searchable, deep-linkable. Export/import of local progress. Sentry and Speed Insights wired.
