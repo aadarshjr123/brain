@@ -1,0 +1,60 @@
+# security
+- id: sop
+  label: Same-origin policy
+  summary: >-
+    Scheme + host + port. Scripts can only read responses and DOM from their own origin unless
+    explicitly allowed.
+  verified: 2026-11-16
+- id: cors
+  label: CORS
+  summary: >-
+    Server headers that relax the same-origin policy for a response. Browser enforces, server opts in.
+  verified: 2026-11-16
+- id: preflight
+  label: CORS preflight
+  summary: >-
+    An OPTIONS request sent first when a cross-origin request has custom headers or non-simple methods.
+    An extra round trip.
+  verified: 2026-11-16
+- id: csp
+  label: Content Security Policy
+  summary: >-
+    Header that whitelists where scripts, styles and connections may come from. The main XSS mitigation.
+  verified: 2026-11-16
+- id: xss
+  label: XSS
+  summary: >-
+    Injecting script via untrusted HTML. innerHTML with user data, or dangerouslySetInnerHTML, is the
+    classic hole.
+  verified: 2026-11-16
+- id: csrf
+  label: CSRF
+  summary: >-
+    Another site makes your browser send a request with your cookies attached. SameSite cookies and
+    tokens defend.
+  verified: 2026-11-16
+- id: https
+  label: HTTPS / HSTS
+  summary: >-
+    TLS for the web. HSTS makes the browser refuse plain HTTP for a site.
+  verified: 2026-11-16
+- id: coop_coep
+  label: COOP / COEP
+  summary: >-
+    Cross-origin isolation headers. Required for SharedArrayBuffer and high-resolution timers.
+  verified: 2026-11-16
+- id: sandbox
+  label: iframe sandbox
+  summary: >-
+    Restricts what an embedded document can do: scripts, forms, top navigation.
+  verified: 2026-11-16
+- id: sri
+  label: Subresource integrity
+  summary: >-
+    A hash on script and link tags so a tampered CDN file is refused.
+  verified: 2026-11-16
+- id: trusted_types
+  label: Trusted Types
+  summary: >-
+    Makes dangerous DOM sinks accept only typed, sanitised values.
+  verified: 2026-11-16

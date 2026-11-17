@@ -1,0 +1,64 @@
+# perf
+- id: crp
+  label: Critical rendering path
+  summary: >-
+    HTML → DOM, CSS → CSSOM, render tree, layout, paint. Everything that must happen before first pixel.
+  verified: 2026-11-16
+- id: ttfb
+  label: TTFB
+  summary: >-
+    Time to first byte of the HTML. Server, DNS, TLS and redirects all add to it.
+  verified: 2026-11-16
+- id: fcp
+  label: FCP
+  summary: >-
+    First Contentful Paint. First text or image on screen.
+  verified: 2026-11-16
+- id: lcp
+  label: LCP
+  summary: >-
+    Largest Contentful Paint. Usually the hero image or heading. Hurt by lazy-loaded heroes and
+    render-blocking CSS.
+  verified: 2026-11-16
+- id: inp
+  label: INP
+  summary: >-
+    Interaction to Next Paint. From input to the next frame. Hurt by long tasks and heavy renders.
+  verified: 2026-11-16
+- id: cls
+  label: CLS
+  summary: >-
+    Cumulative Layout Shift. Elements moving after paint. Caused by images without dimensions, late
+    fonts, injected banners.
+  verified: 2026-11-16
+- id: tbt
+  label: TBT / long tasks
+  summary: >-
+    Total Blocking Time. Sum of the part of each task over 50ms.
+  verified: 2026-11-16
+- id: layout_thrash
+  label: Layout thrashing
+  summary: >-
+    Alternating DOM writes and layout reads in a loop. Each read forces a fresh layout.
+  verified: 2026-11-16
+- id: bundle_size
+  label: Bundle size
+  summary: >-
+    More JS means more download, more parse, more compile, more execute. All on the main thread.
+  verified: 2026-11-16
+- id: image_perf
+  label: Image loading
+  summary: >-
+    Decode is expensive. Responsive srcset, modern formats, fetchpriority=high on the hero, lazy
+    elsewhere.
+  verified: 2026-11-16
+- id: font_loading
+  label: Font loading
+  summary: >-
+    Web fonts block text (FOIT) or swap (FOUT). font-display and preload decide which.
+  verified: 2026-11-16
+- id: core_web_vitals
+  label: Core Web Vitals
+  summary: >-
+    LCP, INP, CLS. The three numbers Google uses and most teams track.
+  verified: 2026-11-16
