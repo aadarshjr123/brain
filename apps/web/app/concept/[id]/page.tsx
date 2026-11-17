@@ -45,8 +45,8 @@ export default async function ConceptPage({ params }: Props) {
         <nav aria-label="Breadcrumb" className="mb-6 text-sm text-muted-foreground">
           <ol className="flex flex-wrap items-center gap-1.5">
             <li>
-              <Link href="/explore" className="hover:text-foreground">
-                Map
+              <Link href="/cheatsheet" className="hover:text-foreground">
+                All concepts
               </Link>
             </li>
             <li aria-hidden>›</li>

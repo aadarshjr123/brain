@@ -243,3 +243,16 @@
     scroll-behavior: auto !important;
   }
 }
+
+/* Print: black on white, no floating chrome. The cheatsheet is designed to be printed. */
+@media print {
+  :root {
+    color-scheme: light;
+    --brand-bg: #fff;
+    --brand-fg: #000;
+    --brand-muted: #333;
+  }
+  a {
+    text-decoration: none;
+  }
+}
