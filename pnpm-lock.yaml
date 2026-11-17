@@ -171,6 +171,9 @@ importers:
       '@brain/config':
         specifier: workspace:*
         version: link:../config
+      '@brain/content':
+        specifier: workspace:*
+        version: link:../content
       eslint:
         specifier: 9.39.5
         version: 9.39.5(jiti@2.7.0)
