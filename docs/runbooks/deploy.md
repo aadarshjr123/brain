@@ -47,3 +47,27 @@ Then revert the bad commit on `main` through a PR.
 | `ERR_PNPM_OUTDATED_LOCKFILE`  | lockfile not committed after a dependency change         | run `pnpm install`, commit `pnpm-lock.yaml`                            |
 | Build skipped unexpectedly    | `turbo-ignore` saw no change in `@brain/web` or its deps | push a change in the app, or redeploy without cache from the dashboard |
 | Wrong URLs in Open Graph tags | `NEXT_PUBLIC_SITE_URL` set to a stale value              | clear it in Project → Settings → Environment Variables                 |
+
+## Monitoring (BRAIN-6)
+
+**Speed Insights and Web Analytics.** In the Vercel project, open _Speed Insights_ and _Analytics_ and press Enable on
+each. The components are already in the root layout and do nothing until these are on. Neither sets cookies.
+
+**Sentry**, optional but recommended:
+
+1. Create a Sentry project of type _Next.js_ and copy its DSN.
+2. In Vercel, under _Settings → Environment Variables_, add these for Production and Preview:
+
+   | Variable                 | Value                                                          |
+   | ------------------------ | -------------------------------------------------------------- |
+   | `NEXT_PUBLIC_SENTRY_DSN` | the DSN                                                        |
+   | `SENTRY_AUTH_TOKEN`      | an org auth token with `project:releases` and `org:read` scope |
+   | `SENTRY_ORG`             | org slug                                                       |
+   | `SENTRY_PROJECT`         | project slug                                                   |
+
+3. Under _Settings → Environment Variables_, make sure _Automatically expose System Environment Variables_ is on.
+   The release tag is `NEXT_PUBLIC_VERCEL_GIT_COMMIT_SHA`.
+4. Redeploy a preview, open `/debug/sentry` and press the button. The error should appear in Sentry within a minute,
+   tagged with the commit SHA and environment `preview`. The page returns 404 in production.
+
+With no DSN set, the Sentry SDK is never downloaded: it sits in a lazily loaded chunk behind the DSN check.
