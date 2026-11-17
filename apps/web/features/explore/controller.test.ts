@@ -133,4 +133,57 @@ describe('ExploreController (no DOM)', () => {
     expect(c.store.getState().selectedId).toBeNull();
     expect(c.handleKey('q')).toBe(false);
   });
+
+  describe('route', () => {
+    it('two picks draw the shortest route and reveal every hop', () => {
+      const c = make();
+      c.setMode('route');
+      c.pick('set_state');
+      expect(c.store.getState().route).toMatchObject({ from: 'set_state', to: null, path: null });
+      c.pick('gpu_process');
+      const { route } = c.store.getState();
+      expect(route.path?.[0]).toBe('set_state');
+      expect(route.path?.at(-1)).toBe('gpu_process');
+      for (const id of route.path ?? []) expect(c.store.getState().visible.has(id)).toBe(true);
+      expect(c.scene().route?.path).toEqual(route.path);
+      expect(c.scene().focus).toBe(false);
+    });
+
+    it('a third pick starts a new route', () => {
+      const c = make();
+      c.setMode('route');
+      c.pick('dom');
+      c.pick('v8');
+      c.pick('fetch');
+      expect(c.store.getState().route).toMatchObject({ from: 'fetch', to: null, path: null });
+    });
+
+    it('reverse swaps the ends; clear and Escape empty it; leaving the mode drops it', () => {
+      const c = make();
+      c.routeFrom('dom');
+      c.routeTo('v8');
+      const forward = c.store.getState().route.path ?? [];
+      c.reverseRoute();
+      expect(c.store.getState().route.path).toEqual([...forward].reverse());
+      c.escape();
+      expect(c.store.getState().route.from).toBeNull();
+      c.routeFrom('dom');
+      c.setMode('explore');
+      expect(c.store.getState().route.from).toBeNull();
+    });
+
+    it('reads hop relations in travel direction', () => {
+      const c = make();
+      expect(c.hopRelation('microtask_queue', 'event_loop')).toMatch(/^← /);
+      expect(c.hopRelation('event_loop', 'microtask_queue')).not.toMatch(/^← /);
+    });
+
+    it('links: ?from=&to= opens a drawn route, and the URL carries it', () => {
+      const c = make();
+      c.applyUrlState(c.parseUrl('?from=set_state&to=gpu_process'));
+      expect(c.store.getState().mode).toBe('route');
+      expect(c.store.getState().route.path?.length).toBeGreaterThan(2);
+      expect(c.serialiseUrl()).toBe('?from=set_state&to=gpu_process');
+    });
+  });
 });

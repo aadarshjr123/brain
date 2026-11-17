@@ -1,7 +1,7 @@
 'use client';
 
 import type { Neighbour } from '@brain/graph-engine';
-import { Shrink, Sparkles, X } from 'lucide-react';
+import { Route, Shrink, Sparkles, X } from 'lucide-react';
 
 import { BookmarkButton } from '@/features/progress/bookmark-button';
 
@@ -80,6 +80,24 @@ export function DetailCard() {
             </button>
           )}
           <BookmarkButton id={node.id} label={node.label} />
+          <button
+            type="button"
+            onClick={() => {
+              c.routeFrom(node.id);
+            }}
+            className="inline-flex items-center gap-1.5 rounded-[9px] border border-border bg-secondary px-3 py-[7px] text-[12.5px] hover:border-input"
+          >
+            <Route aria-hidden className="size-3.5" /> From here
+          </button>
+          <button
+            type="button"
+            onClick={() => {
+              c.routeTo(node.id);
+            }}
+            className="inline-flex items-center gap-1.5 rounded-[9px] border border-border bg-secondary px-3 py-[7px] text-[12.5px] hover:border-input"
+          >
+            <Route aria-hidden className="size-3.5" /> To here
+          </button>
         </div>
         <Relations title={`${node.label} drives`} items={drives} fromId={node.id} />
         <Relations title={`Driven by`} items={drivenBy} fromId={node.id} />
