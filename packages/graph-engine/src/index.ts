@@ -16,3 +16,5 @@ export type {
   Scheduler,
   Transform,
 } from './renderer.ts';
+export { CAMERA, centerOn, fitBounds } from './camera.ts';
+export type { Point } from './camera.ts';
