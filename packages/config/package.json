@@ -2,6 +2,7 @@
   "name": "@brain/config",
   "version": "0.0.0",
   "private": true,
+  "license": "MIT",
   "description": "Shared TypeScript, ESLint and Prettier presets.",
   "exports": {
     "./tsconfig/base.json": "./tsconfig/base.json",

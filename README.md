@@ -58,6 +58,11 @@ NEXT_PUBLIC_E2E=1 pnpm build && pnpm --filter @brain/web e2e   # end-to-end suit
 Most contributions are content: a missing concept, a relation that is wrong, a clearer summary. See
 [`CONTRIBUTING.md`](CONTRIBUTING.md). Report security issues privately, as described in [`SECURITY.md`](SECURITY.md).
 
+## Licence
+
+The code is [MIT](LICENSE). The concept content in `packages/content/data` is
+[CC BY 4.0](packages/content/data/LICENSE): reuse it freely with credit.
+
 ## How the project is run
 
 Like a product team's project: a problem statement, decisions with reasons, tickets with acceptance criteria,
