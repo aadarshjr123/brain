@@ -12,6 +12,9 @@ a relation that is wrong, a clearer summary. Code contributions follow the same 
 4. **Open a PR** titled `BRAIN-n: what it does`. Fill in the template and link the issue.
 5. **CI must be green** and another person must review. Nobody merges their own PR.
 
+By contributing you agree that code is licensed under [MIT](LICENSE) and content in `packages/content/data`
+under [CC BY 4.0](packages/content/data/LICENSE), the same terms as the rest of the project.
+
 ## Adding or fixing a concept
 
 Content lives in `packages/content/data`:
