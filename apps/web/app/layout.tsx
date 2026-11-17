@@ -49,9 +49,13 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
     <html lang="en" className={cn(display.variable, sans.variable, mono.variable)}>
       <body className="min-h-dvh">
         {children}
-        {/* Both are no-ops outside Vercel. No cookies, no personal identifiers. */}
-        <SpeedInsights />
-        <Analytics />
+        {/* Vercel serves these scripts from its edge, so they only exist in Vercel builds. No cookies, no personal identifiers. */}
+        {process.env.VERCEL === '1' && (
+          <>
+            <SpeedInsights />
+            <Analytics />
+          </>
+        )}
       </body>
     </html>
   );
