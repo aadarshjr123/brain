@@ -27,8 +27,11 @@ We tried the three standard ways to allow them without `'unsafe-inline'`:
 - No external script origins at all, no `'unsafe-eval'`, `object-src 'none'`, `base-uri 'self'`,
   `form-action 'self'`, `frame-ancestors 'none'`, `upgrade-insecure-requests`.
 - **Trusted Types** (`require-trusted-types-for 'script'`), with a default policy installed first in `<head>` that
-  allows only our own hashed chunks (`/_next/static/`) and `/sw.js` as script URLs. DOM-based injection, the realistic
-  way to get script into a page with no server-rendered user input, throws instead of running.
+  allows only same-origin script URLs: our hashed chunks (`/_next/static/`), `/sw.js`, and Vercel Speed Insights and
+  Web Analytics. Vercel serves those two from a random first-party path (`/<16 hex>/script.js`, fallback
+  `/_vercel/...`); the first production deploy showed them blocked (BRAIN-35). DOM-based injection, the realistic way
+  to get script into a page with no server-rendered user input, throws instead of running. The allow-list is
+  `SCRIPT_URL_ALLOW` in `features/theme/theme.ts`, unit-tested by running the shipped head script.
 - HSTS (two years, preload), `nosniff`, `strict-origin-when-cross-origin`, `X-Frame-Options: DENY`, COOP,
   and a Permissions-Policy that turns off camera, microphone, geolocation, payment, USB and topics.
 - `connect-src` adds the Sentry ingest origin only when a DSN is configured.
