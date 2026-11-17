@@ -1,0 +1,46 @@
+# Weekly, grouped dependency updates (BRAIN-18).
+# Groups keep related packages in one PR so they move together:
+#   - lint: typescript-eslint must match the pnpm override in pnpm-workspace.yaml and eslint-config-next.
+#   - next: next, eslint-config-next and the React Compiler plugin follow Next's release train.
+#   - react: react, react-dom and their types.
+# TypeScript majors and ESLint majors are ignored on purpose; see ADR-0008 and the ESLint 9 note in the journal.
+version: 2
+updates:
+  - package-ecosystem: npm
+    directory: /
+    schedule:
+      interval: weekly
+      day: monday
+    open-pull-requests-limit: 5
+    commit-message:
+      prefix: chore(deps)
+    labels: ['type:chore', 'area:infra']
+    versioning-strategy: increase
+    ignore:
+      - dependency-name: typescript
+        update-types: ['version-update:semver-major', 'version-update:semver-minor']
+      - dependency-name: eslint
+        update-types: ['version-update:semver-major']
+    groups:
+      lint:
+        patterns: ['typescript-eslint', '@typescript-eslint/*', 'eslint-*', '@eslint/*', 'eslint-plugin-*']
+      next:
+        patterns: ['next', '@next/*', 'eslint-config-next', 'babel-plugin-react-compiler']
+      react:
+        patterns: ['react', 'react-dom', '@types/react', '@types/react-dom']
+      tooling:
+        patterns: ['prettier*', 'husky', 'lint-staged', '@commitlint/*', 'turbo', 'vitest', '@vitest/*']
+      minor-and-patch:
+        update-types: ['minor', 'patch']
+
+  - package-ecosystem: github-actions
+    directory: /
+    schedule:
+      interval: weekly
+      day: monday
+    commit-message:
+      prefix: ci
+    labels: ['type:chore', 'area:infra']
+    groups:
+      actions:
+        patterns: ['*']
