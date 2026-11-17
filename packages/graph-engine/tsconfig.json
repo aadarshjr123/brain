@@ -1,4 +1,7 @@
 {
   "extends": "@brain/config/tsconfig/library.json",
-  "include": ["src"]
+  "compilerOptions": {
+    "types": ["node"]
+  },
+  "include": ["src", "bench"]
 }
