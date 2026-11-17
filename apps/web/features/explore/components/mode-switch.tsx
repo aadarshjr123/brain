@@ -16,7 +16,7 @@ export function ModeSwitch() {
           onClick={() => {
             c.setMode(m);
           }}
-          className="rounded-[9px] px-3 py-[5px] text-[13px] font-medium text-muted-foreground capitalize aria-pressed:bg-primary aria-pressed:text-primary-foreground"
+          className="rounded-[9px] px-2.5 py-[5px] text-[13px] font-medium text-muted-foreground capitalize aria-pressed:bg-primary aria-pressed:text-primary-foreground sm:px-3"
         >
           {m}
         </button>
