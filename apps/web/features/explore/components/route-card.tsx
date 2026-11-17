@@ -90,7 +90,10 @@ export function RouteCard() {
                   <span
                     className={cn(
                       'relative z-[1] grid size-5 place-items-center rounded-full border-2 border-(--c) font-mono text-[9px]',
-                      reached ? 'bg-(--c) text-primary-foreground' : 'bg-surface-solid',
+                      // Foreground on a tint, not white on the raw domain colour: several domain colours are under 4.5:1 with white.
+                      reached
+                        ? 'bg-[color-mix(in_srgb,var(--c)_35%,var(--brand-surface-solid))] text-foreground'
+                        : 'bg-surface-solid',
                       now && 'shadow-[0_0_0_4px_color-mix(in_srgb,var(--c)_30%,transparent)]',
                     )}
                   >

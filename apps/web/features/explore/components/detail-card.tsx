@@ -40,7 +40,7 @@ export function DetailCard() {
         >
           <X aria-hidden className="size-4" />
         </button>
-        <span className="inline-flex items-center gap-1.5 rounded-full border border-[color-mix(in_srgb,var(--c)_40%,transparent)] bg-[color-mix(in_srgb,var(--c)_10%,transparent)] px-2 py-0.5 font-mono text-[10px] tracking-[0.1em] text-(--c) uppercase">
+        <span className="inline-flex items-center gap-1.5 rounded-full border border-[color-mix(in_srgb,var(--c)_40%,transparent)] bg-[color-mix(in_srgb,var(--c)_10%,transparent)] px-2 py-0.5 font-mono text-[10px] tracking-[0.1em] text-foreground uppercase">
           <span aria-hidden className="size-1.5 rounded-full bg-(--c)" />
           {c.domainName(node.domain)}
         </span>

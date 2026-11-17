@@ -100,7 +100,7 @@ function Overlay() {
         <RoutePill />
       </div>
 
-      <div className="absolute inset-x-0 bottom-0 z-[4] max-h-[50%] md:inset-x-auto md:top-[66px] md:right-4 md:bottom-auto md:max-h-[calc(100%-92px)] md:w-[340px] [&>aside]:rounded-b-none md:[&>aside]:rounded-b-[var(--radius)]">
+      <div className="absolute inset-x-0 bottom-0 z-[4] flex max-h-[50%] flex-col md:inset-x-auto md:top-[66px] md:right-4 md:bottom-auto md:max-h-[calc(100%-92px)] md:w-[340px] [&>aside]:min-h-0 [&>aside]:rounded-b-none md:[&>aside]:rounded-b-[var(--radius)]">
         <CardSlot />
       </div>
     </>

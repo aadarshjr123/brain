@@ -71,7 +71,7 @@
     --brand-line-strong: rgb(40 55 80 / 0.3);
     --brand-fg: #121a27;
     --brand-muted: #5a687f;
-    --brand-accent: #b85c08;
+    --brand-accent: #a14f00; /* mockup had #b85c08: 4.06:1 on --brand-bg fails WCAG AA; this is 5.1:1 */
     --brand-accent-ink: #ffffff;
     --brand-danger: #c62828;
     --domain-browser: #d9481f;
@@ -95,7 +95,7 @@
   --brand-line-strong: rgb(40 55 80 / 0.3);
   --brand-fg: #121a27;
   --brand-muted: #5a687f;
-  --brand-accent: #b85c08;
+  --brand-accent: #a14f00;
   --brand-accent-ink: #ffffff;
   --brand-danger: #c62828;
   --domain-browser: #d9481f;
