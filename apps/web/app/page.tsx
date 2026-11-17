@@ -12,9 +12,7 @@ const DOMAINS = [
 export default function Home() {
   return (
     <main className="mx-auto flex min-h-dvh max-w-2xl flex-col justify-center gap-8 px-4 py-16 sm:px-6">
-      <p className="font-mono text-xs tracking-widest text-muted-foreground uppercase">
-        Frontend ↔ Browser
-      </p>
+      <p className="font-mono text-xs tracking-widest text-muted-foreground uppercase">Frontend ↔ Browser</p>
       <h1 className="font-display text-5xl font-bold tracking-tight text-balance">Brain</h1>
       <p className="max-w-prose text-lg text-muted-foreground">
         A free study map of how frontend development touches the browser. Click a concept to see what it
@@ -28,9 +26,7 @@ export default function Home() {
           </li>
         ))}
       </ul>
-      <p className="font-mono text-xs text-muted-foreground">
-        Status: M0 Foundation · the map arrives in M2
-      </p>
+      <p className="font-mono text-xs text-muted-foreground">Status: M0 Foundation · the map arrives in M2</p>
     </main>
   );
 }

@@ -57,10 +57,13 @@ AC: node pop-in with stagger, edge grow, route progressive draw and pulse, as in
 AC: prototype d3-force in a Web Worker posting `Float32Array` positions; note in `journal/` with frame timings at 500 and 1500 nodes; decision recorded as ADR if adopted.
 
 ## M2 — Explore (epics listed; tickets written at M1 close)
+
 EPIC-7 Explore stage (BRAIN-17..21) · EPIC-8 Panels & search (BRAIN-22..28) · EPIC-9 State & local storage (BRAIN-29..33) · EPIC-10 Theming & a11y base (BRAIN-34..36)
 
 ## M3 — Route + reference (epics listed)
+
 EPIC-11 Route mode · EPIC-12 Concept pages · EPIC-13 Cheatsheet · EPIC-14 Offline & metadata
 
 ## M4 — Launch (epics listed)
+
 EPIC-15 Quality gates · EPIC-16 Content drive · EPIC-17 Launch

@@ -1,20 +1,20 @@
 # PRD — Brain
 
-| | |
-|---|---|
-| Status | Draft v1, 2026-11-16 |
-| Owners | Aadarsh (product + eng), Claude (eng) |
-| Reviewers | — |
+|           |                                       |
+| --------- | ------------------------------------- |
+| Status    | Draft v1, 2026-11-16                  |
+| Owners    | Aadarsh (product + eng), Claude (eng) |
+| Reviewers | —                                     |
 
 ## 1. Problem
 
-Frontend developers learn frameworks first and the browser second, if at all. The knowledge that explains *why*
+Frontend developers learn frameworks first and the browser second, if at all. The knowledge that explains _why_
 something is slow, flickers, or breaks (event loop ordering, the render pipeline, CORS, hydration) is scattered
 across blog posts and specs, and none of it shows how the pieces connect. When you forget it, relearning means
 re-reading everything.
 
 Interviews, performance work and debugging all reward the mental model, not the facts. There is no tool that
-lets you *see* the model and walk it.
+lets you _see_ the model and walk it.
 
 ## 2. Users
 
@@ -41,14 +41,14 @@ No accounts. Anyone with the link can use everything.
 
 ## 5. Success metrics
 
-| Metric | Target | How measured |
-|---|---|---|
-| Time to first useful interaction | < 2 s on 4G, mid-range phone | Lighthouse on Vercel preview, Speed Insights in prod |
-| INP on `/explore` | < 200 ms p75 | Speed Insights |
-| Route success | ≥ 95% of random concept pairs produce a path ≤ 7 hops | Unit test over the content graph |
-| Content coverage | ≥ 150 concepts, ≥ 300 relations, every node has a description and ≥ 1 source | Build-time validator |
-| Reference speed | Search to concept card in ≤ 2 keystrokes + Enter for top 50 concepts | Playwright |
-| Return value | Owner relearns the browser model from the tool alone before a mock interview | Journal entry |
+| Metric                           | Target                                                                       | How measured                                         |
+| -------------------------------- | ---------------------------------------------------------------------------- | ---------------------------------------------------- |
+| Time to first useful interaction | < 2 s on 4G, mid-range phone                                                 | Lighthouse on Vercel preview, Speed Insights in prod |
+| INP on `/explore`                | < 200 ms p75                                                                 | Speed Insights                                       |
+| Route success                    | ≥ 95% of random concept pairs produce a path ≤ 7 hops                        | Unit test over the content graph                     |
+| Content coverage                 | ≥ 150 concepts, ≥ 300 relations, every node has a description and ≥ 1 source | Build-time validator                                 |
+| Reference speed                  | Search to concept card in ≤ 2 keystrokes + Enter for top 50 concepts         | Playwright                                           |
+| Return value                     | Owner relearns the browser model from the tool alone before a mock interview | Journal entry                                        |
 
 ## 6. Scope of v1
 
@@ -57,12 +57,12 @@ static page per concept, cheatsheet list view, offline shell, local progress wit
 
 ## 7. Risks
 
-| Risk | Impact | Mitigation |
-|---|---|---|
-| Content accuracy | Wrong facts teach wrong models | Sources per node, PR review checklist, "last verified" date |
-| Graph becomes cluttered as it grows | Unusable map | Unfold in pages, layer filters, hub-only labels at low zoom, worker layout past 500 nodes |
-| Canvas is invisible to screen readers | Excludes users | Every view has a DOM equivalent: cheatsheet and concept pages |
-| Scope creep into a course platform | Never ships | Non-goals above, milestone gates in the roadmap |
+| Risk                                  | Impact                         | Mitigation                                                                                |
+| ------------------------------------- | ------------------------------ | ----------------------------------------------------------------------------------------- |
+| Content accuracy                      | Wrong facts teach wrong models | Sources per node, PR review checklist, "last verified" date                               |
+| Graph becomes cluttered as it grows   | Unusable map                   | Unfold in pages, layer filters, hub-only labels at low zoom, worker layout past 500 nodes |
+| Canvas is invisible to screen readers | Excludes users                 | Every view has a DOM equivalent: cheatsheet and concept pages                             |
+| Scope creep into a course platform    | Never ships                    | Non-goals above, milestone gates in the roadmap                                           |
 
 ## 8. Open questions
 

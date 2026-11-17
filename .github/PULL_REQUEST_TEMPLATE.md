@@ -3,11 +3,15 @@
 Closes #
 
 ### What
+
 ### Why
+
 ### How to verify (on the preview URL)
+
 - [ ]
 
 ### Checklist
+
 - [ ] AC in the ticket met, nothing beyond it
 - [ ] State in the right store (ADR-0006); React out of the frame loop
 - [ ] Tests added or updated

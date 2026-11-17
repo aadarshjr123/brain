@@ -22,27 +22,27 @@ The trade: the canvas stage is a `'use client'` island loaded with `next/dynamic
 
 ## 2. Stack
 
-| Layer | Choice | Notes |
-|---|---|---|
-| Framework | **Next.js 16** (App Router, Turbopack), **React 19**, React Compiler on | TypeScript `strict`, `noUncheckedIndexedAccess` |
-| Language | **TypeScript 5.x** | No `any` in `src/`. Zod at every boundary (content, URL params, API). |
-| Styling | **Tailwind CSS v4** + **shadcn/ui** | Tokens from the mockup become CSS variables in `globals.css`; shadcn components for cards, sheets, command palette, toasts. |
-| Animation | **motion** (panels) + hand-written time-based tweens in the canvas renderer | Canvas animation is driven by the frame clock, never by React state. |
-| Graph rendering | **Canvas 2D renderer** (ported from the mockup) + `d3-force`, `d3-zoom`, `d3-drag` | Lives in `packages/graph-engine`, framework-free, so it can be reused in a 3D or native view later. |
-| App state | **Redux Toolkit 2** (+ RTK devtools, redux-persist) | Domain state that must be serialisable, inspectable and replayable: learning progress, settings, bookmarks, session history. See §4a. |
-| Engine state | **Zustand 5** (vanilla store) | High-frequency, transient state the canvas needs outside React: hover, drag, camera, animation clocks, selection. See §4a. |
-| Server state | **TanStack Query 5** (deferred) | No backend in v1, so nothing for it to cache. Add when a server-side feature appears (see ADR-0005). |
-| Local storage | **Dexie (IndexedDB)** + redux-persist for settings | All personal progress lives on the device. Export/import as JSON. No accounts (ADR-0005). |
-| Database / Auth | **None in v1** | The product is a public reference. Content is in the repo, progress is local. |
-| Content | **Velite** (or Content Collections) with Zod schemas | `content/nodes/*.yaml`, `content/edges.yaml`, `content/notes/*.mdx`. Type-safe, validated at build. |
-| Search | **MiniSearch** on the client; **cmdk** (via shadcn Command) for the palette | |
-| Testing | **Vitest** + **Testing Library**, **Playwright** e2e, **Storybook 9** for UI components | Graph engine has 100% unit coverage target; UI smoke tests only. |
-| Quality | **ESLint 9 flat config** (next, typescript-eslint, jsx-a11y) + **Prettier** | Biome is fine too, but the Next.js ecosystem plugins are ESLint-first. |
-| Git hygiene | **Husky** + **lint-staged**, **Conventional Commits** (commitlint), **Changesets** for package versions | |
-| CI/CD | **GitHub Actions**: typecheck, lint, unit, build, e2e on PR; **Vercel** preview per PR, production on `main` | See §4c for hosting. |
-| Monitoring | **Vercel Analytics + Speed Insights**, **Sentry** | An app about Core Web Vitals should track its own. |
-| PWA | **Serwist** | On topic: the app about service workers ships one. |
-| Package manager | **pnpm** workspaces + **Turborepo** | Light monorepo from day one (see layout). |
+| Layer           | Choice                                                                                                       | Notes                                                                                                                                 |
+| --------------- | ------------------------------------------------------------------------------------------------------------ | ------------------------------------------------------------------------------------------------------------------------------------- |
+| Framework       | **Next.js 16** (App Router, Turbopack), **React 19**, React Compiler on                                      | TypeScript `strict`, `noUncheckedIndexedAccess`                                                                                       |
+| Language        | **TypeScript 5.x**                                                                                           | No `any` in `src/`. Zod at every boundary (content, URL params, API).                                                                 |
+| Styling         | **Tailwind CSS v4** + **shadcn/ui**                                                                          | Tokens from the mockup become CSS variables in `globals.css`; shadcn components for cards, sheets, command palette, toasts.           |
+| Animation       | **motion** (panels) + hand-written time-based tweens in the canvas renderer                                  | Canvas animation is driven by the frame clock, never by React state.                                                                  |
+| Graph rendering | **Canvas 2D renderer** (ported from the mockup) + `d3-force`, `d3-zoom`, `d3-drag`                           | Lives in `packages/graph-engine`, framework-free, so it can be reused in a 3D or native view later.                                   |
+| App state       | **Redux Toolkit 2** (+ RTK devtools, redux-persist)                                                          | Domain state that must be serialisable, inspectable and replayable: learning progress, settings, bookmarks, session history. See §4a. |
+| Engine state    | **Zustand 5** (vanilla store)                                                                                | High-frequency, transient state the canvas needs outside React: hover, drag, camera, animation clocks, selection. See §4a.            |
+| Server state    | **TanStack Query 5** (deferred)                                                                              | No backend in v1, so nothing for it to cache. Add when a server-side feature appears (see ADR-0005).                                  |
+| Local storage   | **Dexie (IndexedDB)** + redux-persist for settings                                                           | All personal progress lives on the device. Export/import as JSON. No accounts (ADR-0005).                                             |
+| Database / Auth | **None in v1**                                                                                               | The product is a public reference. Content is in the repo, progress is local.                                                         |
+| Content         | **Velite** (or Content Collections) with Zod schemas                                                         | `content/nodes/*.yaml`, `content/edges.yaml`, `content/notes/*.mdx`. Type-safe, validated at build.                                   |
+| Search          | **MiniSearch** on the client; **cmdk** (via shadcn Command) for the palette                                  |                                                                                                                                       |
+| Testing         | **Vitest** + **Testing Library**, **Playwright** e2e, **Storybook 9** for UI components                      | Graph engine has 100% unit coverage target; UI smoke tests only.                                                                      |
+| Quality         | **ESLint 9 flat config** (next, typescript-eslint, jsx-a11y) + **Prettier**                                  | Biome is fine too, but the Next.js ecosystem plugins are ESLint-first.                                                                |
+| Git hygiene     | **Husky** + **lint-staged**, **Conventional Commits** (commitlint), **Changesets** for package versions      |                                                                                                                                       |
+| CI/CD           | **GitHub Actions**: typecheck, lint, unit, build, e2e on PR; **Vercel** preview per PR, production on `main` | See §4c for hosting.                                                                                                                  |
+| Monitoring      | **Vercel Analytics + Speed Insights**, **Sentry**                                                            | An app about Core Web Vitals should track its own.                                                                                    |
+| PWA             | **Serwist**                                                                                                  | On topic: the app about service workers ships one.                                                                                    |
+| Package manager | **pnpm** workspaces + **Turborepo**                                                                          | Light monorepo from day one (see layout).                                                                                             |
 
 ---
 
@@ -86,6 +86,7 @@ content (YAML/MDX)  →  Velite build  →  typed Graph  →  Zustand store  →
 ```
 
 Rules:
+
 1. **Renderer is a class** created once in `Stage.tsx`; it owns canvas, transform, positions, dirty flag and the rAF loop.
 2. **React never runs per frame.** The renderer subscribes to the store and marks itself dirty; panels re-render on store changes only.
 3. **Draw only when dirty or animating**, pause when `document.hidden`. Reduced-motion collapses tweens to instant.
@@ -93,18 +94,18 @@ Rules:
 5. **URL is state**: `/explore?n=event_loop`, `/explore?from=set_state&to=gpu_process`. Every view is linkable.
 6. **Content is the product.** PRs that only touch `packages/content` must pass the validator (ids, duplicates, reachability, relation grammar) and preview on Vercel.
 
-
 ### 4a. State management: who owns what
 
 Three stores, three jobs, no overlap.
 
-| Store | Holds | Why this tool |
-|---|---|---|
-| **Redux Toolkit** | `progress` (concepts seen, routes taken, quiz results), `settings` (theme, reduced motion, layers), `bookmarks`, `session` (trail, last view) | Serialisable, time-travel devtools, middleware for analytics and persistence, predictable for contributors. Persisted with redux-persist to IndexedDB. |
-| **Zustand (vanilla)** | `hover`, `selected`, `mode`, `routeA/B/path`, `visible` set, camera transform, drag target, animation timestamps | Updated many times per second. The Renderer subscribes with `store.subscribe` and never goes through React. No reducers, no serialisation cost. |
-| **TanStack Query** | Nothing in v1. Reserved for a future server feature. | Listed so contributors do not reach for it for local data. |
+| Store                 | Holds                                                                                                                                         | Why this tool                                                                                                                                          |
+| --------------------- | --------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| **Redux Toolkit**     | `progress` (concepts seen, routes taken, quiz results), `settings` (theme, reduced motion, layers), `bookmarks`, `session` (trail, last view) | Serialisable, time-travel devtools, middleware for analytics and persistence, predictable for contributors. Persisted with redux-persist to IndexedDB. |
+| **Zustand (vanilla)** | `hover`, `selected`, `mode`, `routeA/B/path`, `visible` set, camera transform, drag target, animation timestamps                              | Updated many times per second. The Renderer subscribes with `store.subscribe` and never goes through React. No reducers, no serialisation cost.        |
+| **TanStack Query**    | Nothing in v1. Reserved for a future server feature.                                                                                          | Listed so contributors do not reach for it for local data.                                                                                             |
 
 Flow for one user action, "unfold Event loop":
+
 1. Stage → Zustand: `visible` grows, renderer marks dirty, animation plays.
 2. Zustand middleware emits a domain event → Redux `progress/conceptExplored`.
 3. Redux listener middleware appends the event to Dexie.
@@ -121,21 +122,23 @@ Rule of thumb for contributors: if the Renderer needs it per frame, Zustand. If 
 
 ### 4c. Hosting
 
-| Piece | Where | Notes |
-|---|---|---|
-| Next.js app (static export + ISR not needed) | **Vercel** Hobby | Preview URL per PR, production on `main`, global CDN, Speed Insights. Alternative: Cloudflare Pages. |
-| Domain | Cloudflare Registrar + DNS | Optional; `brain.vercel.app` is fine for v1. |
-| Monitoring | Sentry (errors), Vercel Analytics + Speed Insights (vitals) | An app about Core Web Vitals tracks its own. |
-| Secrets | Only `SENTRY_DSN` and analytics ids; `.env.example` committed, `.env` never | |
-| Environments | `local`, `preview` (every PR), `production` | No database, so no migrations in CI. |
+| Piece                                        | Where                                                                       | Notes                                                                                                |
+| -------------------------------------------- | --------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------- |
+| Next.js app (static export + ISR not needed) | **Vercel** Hobby                                                            | Preview URL per PR, production on `main`, global CDN, Speed Insights. Alternative: Cloudflare Pages. |
+| Domain                                       | Cloudflare Registrar + DNS                                                  | Optional; `brain.vercel.app` is fine for v1.                                                         |
+| Monitoring                                   | Sentry (errors), Vercel Analytics + Speed Insights (vitals)                 | An app about Core Web Vitals tracks its own.                                                         |
+| Secrets                                      | Only `SENTRY_DSN` and analytics ids; `.env.example` committed, `.env` never |                                                                                                      |
+| Environments                                 | `local`, `preview` (every PR), `production`                                 | No database, so no migrations in CI.                                                                 |
 
 Expected cost: $0.
 
 Content model:
+
 ```ts
 Node  { id; label; domain; summary; note?: mdx; aliases?: string[]; sources?: Url[] }
 Edge  [from, to, relation, { weight?: 1|2|3, since?: string }]
 ```
+
 Relation text reads from → to. `weight` lets Route prefer strong mechanical links.
 
 ---
