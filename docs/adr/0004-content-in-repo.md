@@ -1,10 +1,10 @@
 # ADR-0004: Content lives in the repository, not a database or CMS
 
-|          |                 |
-| -------- | --------------- |
-| Status   | Accepted        |
-| Date     | 2026-11-16      |
-| Deciders | Aadarsh, Claude |
+|          |                               |
+| -------- | ----------------------------- |
+| Status   | Accepted, amended by ADR-0009 |
+| Date     | 2026-11-16                    |
+| Deciders | Aadarsh, Claude               |
 
 ## Context
 

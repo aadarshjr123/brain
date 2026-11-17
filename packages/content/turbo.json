@@ -1,0 +1,13 @@
+{
+  "$schema": "https://turborepo.com/schema.json",
+  "extends": ["//"],
+  "tasks": {
+    "build": {
+      "inputs": ["data/**", "src/**", "!src/**/*.test.ts"],
+      "outputs": ["generated/**"]
+    },
+    "typecheck": { "dependsOn": ["build"] },
+    "lint": { "dependsOn": ["build"] },
+    "test": { "dependsOn": ["build"] }
+  }
+}

@@ -1,0 +1,25 @@
+# The eight layers of the map. Colors live in the app's design tokens (--domain-<id>), not here.
+- id: browser
+  name: Browser internals
+  description: Processes, threads, the event loop and the render pipeline that turn your code into pixels.
+- id: js
+  name: JavaScript
+  description: The engine and the language model you write against.
+- id: net
+  name: Network
+  description: How bytes get from a server to the page, and what the browser caches on the way.
+- id: fw
+  name: Frameworks
+  description: React and friends, and what they ask the browser to do on your behalf.
+- id: perf
+  name: Performance
+  description: The metrics users feel and the techniques that move them.
+- id: sec
+  name: Security
+  description: The rules that keep one origin from reading or running another.
+- id: store
+  name: Storage
+  description: Where data lives in the browser, and for how long.
+- id: api
+  name: Web APIs
+  description: Platform features you call from JavaScript.
