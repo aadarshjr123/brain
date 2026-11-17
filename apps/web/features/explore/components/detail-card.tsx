@@ -1,7 +1,8 @@
 'use client';
 
 import type { Neighbour } from '@brain/graph-engine';
-import { Route, Shrink, Sparkles, X } from 'lucide-react';
+import { FileText, Route, Shrink, Sparkles, X } from 'lucide-react';
+import Link from 'next/link';
 
 import { BookmarkButton } from '@/features/progress/bookmark-button';
 
@@ -50,6 +51,12 @@ export function DetailCard() {
           {node.label}
         </h2>
         <p className="text-[13.5px] text-muted-foreground">{node.summary}</p>
+        <Link
+          href={`/concept/${node.id}`}
+          className="mt-2 inline-flex items-center gap-1.5 text-[12.5px] text-muted-foreground underline-offset-4 hover:text-foreground hover:underline"
+        >
+          <FileText aria-hidden className="size-3.5" /> Concept page, sources and routes
+        </Link>
       </header>
 
       <div className="px-4 pt-3 pb-4">
